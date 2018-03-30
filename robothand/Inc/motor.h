@@ -46,12 +46,12 @@ private:
 public:
 	void pid_process();
 private:
-	TIM_HandleTypeDef *m_Mhtim;
+	TIM_HandleTypeDef 		*m_Mhtim;
 	uint32_t 				m_outA;
 	uint32_t 				m_outB;
 	GPIO_TypeDef 			*m_MGPIOx;
 	uint16_t 				m_MGPIO_Pin;
-	TIM_HandleTypeDef *m_Ehtim;
+	TIM_HandleTypeDef 		*m_Ehtim;
 	GPIO_TypeDef 			*m_EGPIOx; 
 	uint16_t 				m_EGPIO_Pin;
 	int8_t  				m_dutyratio;
@@ -60,7 +60,7 @@ private:
  */
 public:
 	uint16_t				m_frequence;
-	pid_ctrl_t      m_pid;
+	pid_ctrl_t      		m_pid;
 	int16_t 				m_EncValue;
 	int16_t					m_trace;
 };
