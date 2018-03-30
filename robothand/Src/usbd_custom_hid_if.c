@@ -51,6 +51,7 @@
 #include "usbd_custom_hid_if.h"
 
 /* USER CODE BEGIN INCLUDE */
+#include "rhpacket.h"
 
 /* USER CODE END INCLUDE */
 
@@ -62,6 +63,20 @@
 /* Private variables ---------------------------------------------------------*/
 int16_t dr = 0;
 unsigned char tempvar[64];
+
+static void CMD_MotorStatusCtrl(Motor *motor,unsigned char *data);
+static void CMD_PIDParaCTRL(Motor *motor,unsigned char *data);
+static void CMD_MotionCTRL(Motor *motor,unsigned char *data);
+static void CMD_FrequenceCTRL(Motor *motor, unsigned char *data);
+
+RH_CMD_PROCESS_Itf hCMDProcessfunc = 
+{
+	CMD_MotorStatusCtrl,
+	CMD_PIDParaCTRL,
+	CMD_MotionCTRL,
+	CMD_FrequenceCTRL
+};
+
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -161,7 +176,7 @@ __ALIGN_BEGIN static uint8_t CUSTOM_HID_ReportDesc_FS[USBD_CUSTOM_HID_REPORT_DES
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
 /* USER CODE BEGIN EXPORTED_VARIABLES */
-
+extern Motor motor[];
 /* USER CODE END EXPORTED_VARIABLES */
 /**
   * @}
@@ -228,10 +243,22 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   /* USER CODE BEGIN 6 */
 	USBD_CUSTOM_HID_HandleTypeDef     *hhid;
   hhid = (USBD_CUSTOM_HID_HandleTypeDef*) hUsbDeviceFS.pClassData;
-	memset(tempvar, 0 ,64);
-	memcpy(tempvar, hhid->Report_buf, 64);
-	memcpy(&dr, tempvar, 2);
-	USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS, tempvar, 64);
+
+	static unsigned char *data = NULL;
+	static uint8_t data_size = 0;
+	if(IsPacketValid(hhid->Report_buf))
+	{
+		switch(GetPacketInfo(hhid->Report_buf, &data, &data_size))
+		{
+			case CMD:
+				ProcessCMD(hCMDProcessfunc, motor, data, data_size);
+				break;
+			default:
+				//Todo Send Error Log
+				break;
+				
+		}
+	}
   return (USBD_OK);
   /* USER CODE END 6 */
 }
@@ -252,6 +279,47 @@ int8_t USB_Send_64_bytes(void *report, uint16_t len)
 /* USER CODE END 7 */
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+
+
+static void CMD_MotorStatusCtrl(Motor *motor, unsigned char *data)
+{
+	for(int i = 0; i < 3; i++)
+	{
+		if (data[i+1] == 1)
+			motor[i].enable();
+		else
+			motor[i].disable();
+	}
+}
+
+static void CMD_PIDParaCTRL(Motor *motor, unsigned char *data)
+{
+	for(int i = 0;i < 3; i++)
+	{
+		memcpy(&motor[i].m_pid, &data[1+3*sizeof(float)*i], 3*sizeof(float));
+	}
+}
+
+static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
+{
+	uint16_t *motion = (uint16_t *) &data[1];
+	for(int i = 0;i < 3; i++)
+	{
+		motor[i].setTrace(motion[i]);
+	}
+}
+
+static void CMD_FrequenceCTRL(Motor *motor, unsigned char *data)
+{
+	uint16_t motion = *(uint16_t *)&data[1];
+	for(int i = 0;i < 3; i++)
+	{
+		motor[i].setFrequence(motion);
+	}
+}
+
+
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 /**

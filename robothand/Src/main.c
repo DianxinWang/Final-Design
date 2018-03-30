@@ -121,10 +121,10 @@ int main(void)
   MX_TIM8_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
- Motor motor4(motor_4_init);
-	motor4.enable();
-	motor4.setDutyratio(40);
-	motor4.start();
+ Motor motor[4] = {Motor(motor_init[0]),Motor(motor_init[1]),Motor(motor_init[2]),Motor(motor_init[3])};
+	motor[0].enable();
+	motor[0].setDutyratio(40);
+	motor[0].start();
 	/*
 	Motor motor3(motor_3_init);
 	motor3.enable();
@@ -158,8 +158,8 @@ int main(void)
 		{
 			PIDflag = false;
 			dr = dr ;
-			motor4.pid_process(dr);
-			motor4.start();
+			motor[2].pid_process();
+			motor[2].start();
 			/*temp[i] = motor2.getEncoderValue();
 			i++;
 			if(i > 31) 

@@ -15,7 +15,7 @@ Motor::Motor(Motor_InitTypeDef MotEnc)
 	m_Ehtim = MotEnc.Ehtim;
 	m_EGPIOx = MotEnc.EGPIOx;
 	m_EGPIO_Pin = MotEnc.EGPIO_Pin;
-	m_SampleFrequence = 1000;
+	m_frequence = 1000;
 	pid_init(&m_pid);
 	pid_set_gains(&m_pid, 1, 0, 0);
 };
@@ -84,10 +84,21 @@ void Motor::setDutyratio(int8_t dutyratio)
 	m_dutyratio = dutyratio;
 }
 
-void Motor::pid_process(int16_t setvalue)
+void Motor::setTrace(int16_t setvalue)
+{
+	m_trace = setvalue;
+}
+
+void Motor::setFrequence(uint16_t frequence)
+{
+	m_frequence = frequence;
+	pid_set_frequency(&m_pid, m_frequence);
+}
+
+void Motor::pid_process()
 {
 	this->getEncoderValue();
-	m_dutyratio = ::pid_process(&m_pid, m_EncValue - setvalue);
+	m_dutyratio = ::pid_process(&m_pid, m_EncValue - m_trace);
 	if(m_dutyratio > 100) m_dutyratio = 100;
 	else if(m_dutyratio < -100) m_dutyratio = -100;
 }
