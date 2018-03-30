@@ -7,8 +7,9 @@ extern "C" {
 
 #include "motor.h"
 #include "main.h"
-
-Motor_InitTypeDef motor_1_init = {
+Motor_InitTypeDef motor_init[4] = 
+{
+{
 	&htim5,
 	TIM_CHANNEL_1,
 	TIM_CHANNEL_2,
@@ -17,9 +18,9 @@ Motor_InitTypeDef motor_1_init = {
 	&htim1,
 	ENCODER_EN_1_GPIO_Port,
 	ENCODER_EN_1_Pin,
-};
+},
 
-Motor_InitTypeDef motor_2_init = {
+{
 	&htim5,
 	TIM_CHANNEL_3,
 	TIM_CHANNEL_4,
@@ -28,9 +29,9 @@ Motor_InitTypeDef motor_2_init = {
 	&htim2,
 	ENCODER_EN_2_GPIO_Port,
 	ENCODER_EN_2_Pin
-};
+},
 
-Motor_InitTypeDef motor_3_init = {
+{
 	&htim8,
 	TIM_CHANNEL_1,
 	TIM_CHANNEL_2,
@@ -39,9 +40,9 @@ Motor_InitTypeDef motor_3_init = {
 	&htim3,
 	ENCODER_EN_3_GPIO_Port,
 	ENCODER_EN_3_Pin
-};
+},
 
-Motor_InitTypeDef motor_4_init = {
+{
 	&htim8,
 	TIM_CHANNEL_3,
 	TIM_CHANNEL_4,
