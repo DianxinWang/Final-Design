@@ -21,7 +21,7 @@ extern "C" {
 
 typedef enum
 {
-	MATLAB 	= 0,
+	PC 	= 0,
 	RH 		= 1,
 	UNITY	= 2,
 	DG		= 3,

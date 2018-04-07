@@ -51,6 +51,7 @@ Motor_InitTypeDef motor_init[4] =
 	&htim4,
 	ENCODER_EN_3_GPIO_Port,
 	ENCODER_EN_3_Pin
+}
 };
 
 #ifdef __cplusplus

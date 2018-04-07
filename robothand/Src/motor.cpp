@@ -13,17 +13,20 @@ Motor::Motor(Motor_InitTypeDef MotEnc)
 	m_MGPIOx = MotEnc.MGPIOx;
 	m_MGPIO_Pin = MotEnc.MGPIO_Pin;
 	m_Ehtim = MotEnc.Ehtim;
-	m_EGPIOx = MotEnc.EGPIOx;
+	m_EGPIOx = MotEnc.EGPIOx;  			//Todo delte
 	m_EGPIO_Pin = MotEnc.EGPIO_Pin;
-	m_frequence = 1000;
 	pid_init(&m_pid);
 	pid_set_gains(&m_pid, 1, 0, 0);
+};
+
+Motor::~Motor()
+{	
 };
 
 void Motor::enable()
 {
 	HAL_GPIO_WritePin(m_MGPIOx, m_MGPIO_Pin, GPIO_PIN_SET);
-	HAL_GPIO_WritePin(m_EGPIOx, m_EGPIO_Pin, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(m_EGPIOx, m_EGPIO_Pin, GPIO_PIN_SET);//Todo delete
 	HAL_TIM_Encoder_Start(m_Ehtim, TIM_CHANNEL_ALL);
 }
 void Motor::disable()
@@ -89,10 +92,9 @@ void Motor::setTrace(int16_t setvalue)
 	m_trace = setvalue;
 }
 
-void Motor::setFrequence(uint16_t frequence)
+void Motor::setFrequence()
 {
-	m_frequence = frequence;
-	pid_set_frequency(&m_pid, m_frequence);
+	pid_set_frequency(&m_pid, 1000.0/m_interval);
 }
 
 void Motor::pid_process()

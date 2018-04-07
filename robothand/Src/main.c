@@ -59,6 +59,7 @@
 #include "usbd_custom_hid_if.h"
 #include "motor.h"
 #include "usr_init.h"
+#include "rhpacket.h"
 #include <cstring>
 /* USER CODE END Includes */
 
@@ -66,8 +67,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
-bool PIDflag = true;
+Motor motor[4] = {Motor(motor_init[0]),Motor(motor_init[1]),Motor(motor_init[2]),Motor(motor_init[3])};
+uint16_t Motor::m_interval = 5;
+static int16_t CtrlInterv = 5;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,29 +123,11 @@ int main(void)
   MX_TIM8_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
- Motor motor[4] = {Motor(motor_init[0]),Motor(motor_init[1]),Motor(motor_init[2]),Motor(motor_init[3])};
-	motor[0].enable();
-	motor[0].setDutyratio(40);
-	motor[0].start();
-	/*
-	Motor motor3(motor_3_init);
-	motor3.enable();
-	motor3.setDutyratio(40);
-	motor3.start();
+
+	static uint16_t force[4] = {0};
+	static unsigned char msg[64] = {0};
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&force,16);
 	
-	Motor motor2(motor_2_init);
-	motor2.enable();
-	motor2.setDutyratio(100);
-	motor2.start();
-	
-	Motor motor1(motor_1_init);
-	motor1.enable();
-	motor1.setDutyratio(40);
-	motor1.start();*/
-	
-	
-	uint16_t temp[16] = {0};
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&temp,16);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -154,20 +138,21 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	while (PIDflag)
+	while (CtrlInterv <= 0)
 		{
-			PIDflag = false;
-			dr = dr ;
-			motor[2].pid_process();
-			motor[2].start();
-			/*temp[i] = motor2.getEncoderValue();
-			i++;
-			if(i > 31) 
+			CtrlInterv = Motor::m_interval;
+			
+			//start motor functions
+			for(int i = 0; i <4; i++)
 			{
-				i = 0;
-				USB_Send_64_bytes(temp,64);
-				HAL_Delay(1000);
-			}*/
+				motor[i].pid_process();
+				motor[i].start();
+			}
+			
+			
+			//sending report to PC
+			BuildRH_TraceForceMsg(motor, force, msg);
+			USB_Send_64_bytes(msg);
 		}	
   }
   /* USER CODE END 3 */
@@ -234,7 +219,7 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_SYSTICK_Callback(void)
 {
-	PIDflag = true;
+	CtrlInterv--;
 }
 /* USER CODE END 4 */
 

@@ -16,8 +16,8 @@ typedef struct Motor_Init
 	uint32_t 				Channel2; 
 	GPIO_TypeDef 			*MGPIOx; 
 	uint16_t 				MGPIO_Pin;
-	TIM_HandleTypeDef *Ehtim;
-	GPIO_TypeDef 			*EGPIOx;
+	TIM_HandleTypeDef *Ehtim; 
+	GPIO_TypeDef 			*EGPIOx; //Todo delete
 	uint16_t 				EGPIO_Pin;
 	
 }Motor_InitTypeDef;
@@ -39,7 +39,7 @@ public:
 	void setDutyratio(int8_t dutyratio);
 	void getEncoderValue();
 	void setTrace(int16_t setvalue);
-	void setFrequence(uint16_t frequence);
+	void setFrequence();
 	int8_t getDutyRatio();
 private:
 	void setPWM(uint32_t Channel,uint8_t value);
@@ -59,8 +59,8 @@ private:
  * These varialbes are intended for PID motion control
  */
 public:
-	uint16_t				m_frequence;
-	pid_ctrl_t      		m_pid;
+	static uint16_t	m_interval;
+	pid_ctrl_t      m_pid;
 	int16_t 				m_EncValue;
 	int16_t					m_trace;
 };

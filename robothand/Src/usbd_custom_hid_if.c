@@ -271,9 +271,9 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
   * @retval USBD_OK if all operations are OK else USBD_FAIL
   */
 
-int8_t USB_Send_64_bytes(void *report, uint16_t len)
+int8_t USB_Send_64_bytes(void *report)
 {
-  return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t *) report, len);
+  return USBD_CUSTOM_HID_SendReport(&hUsbDeviceFS,(uint8_t *) report, 64);
 }
 
 /* USER CODE END 7 */
@@ -303,7 +303,7 @@ static void CMD_PIDParaCTRL(Motor *motor, unsigned char *data)
 
 static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
 {
-	uint16_t *motion = (uint16_t *) &data[1];
+	int16_t *motion = (int16_t *) &data[1];
 	for(int i = 0;i < 3; i++)
 	{
 		motor[i].setTrace(motion[i]);
@@ -312,10 +312,11 @@ static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
 
 static void CMD_FrequenceCTRL(Motor *motor, unsigned char *data)
 {
-	uint16_t motion = *(uint16_t *)&data[1];
+	uint16_t initerval = *(uint16_t *)&data[1];
+	Motor::m_interval = initerval;
 	for(int i = 0;i < 3; i++)
 	{
-		motor[i].setFrequence(motion);
+		motor[i].setFrequence();
 	}
 }
 
