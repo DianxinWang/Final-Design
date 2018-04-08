@@ -16,7 +16,7 @@ Motor::Motor(Motor_InitTypeDef MotEnc)
 	m_EGPIOx = MotEnc.EGPIOx;  			//Todo delte
 	m_EGPIO_Pin = MotEnc.EGPIO_Pin;
 	pid_init(&m_pid);
-	pid_set_gains(&m_pid, 1, 0, 0);
+	pid_set_gains(&m_pid, 0.01, 0.002, 0);
 };
 
 Motor::~Motor()

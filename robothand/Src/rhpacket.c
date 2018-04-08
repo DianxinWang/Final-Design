@@ -124,7 +124,7 @@ void BuildRH_TraceForceMsg(
 	uint8_t data[DATA_SIZE_MAX];
 	for(int i = 0; i < 4; i++)
 	{
-		((uint16_t *)data)[pos++] = motor[i].m_trace;
+		((uint16_t *)data)[pos++] = motor[i].m_EncValue;
 		((uint16_t *)data)[pos++] = adc[i];
 	}
 	
