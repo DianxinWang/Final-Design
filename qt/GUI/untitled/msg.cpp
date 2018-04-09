@@ -6,8 +6,7 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
      QObject(parent),
      m_hid(RH_VID, RH_PID, this),
      m_rhtrace(4),
-     m_rhforce(4),
-     trace_2(1000)
+     m_rhforce(4)
 {
     qDebug()<<"MsgConstructor ID"<<QThread::currentThreadId();
     m_rawdata = new unsigned char[65];

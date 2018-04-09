@@ -148,8 +148,9 @@ int main(void)
 			//start motor functions
 			for(int i = 0; i <4; i++)
 			{
-				motor[i].setTrace(a);
+				//motor[i].setTrace(a);
 				motor[i].pid_process();
+				motor[i].forward(100);
 				motor[i].start();
 			}
 			

@@ -16,6 +16,8 @@ Window {
         z:1
         anchors.fill: parent
         antialiasing: true
+        animationOptions: ChartView.GridAxisAnimations
+        animationDuration: 400
         LineSeries {
             id: rh1_data
             name: "Rh1"
@@ -25,7 +27,6 @@ Window {
                 min: 0
                 max: 1000
             }
-
             axisY: ValueAxis {
                 min: 0
                 max: 65536
@@ -49,9 +50,24 @@ Window {
             onTraceDraw:{
                 if(rh1_data.count >= 1000){
                     rh1_data.remove(0)
+                    if(rh1_data.at(rh1_data.count-1).x > (rh1_xAxis.max-50))
+                    {
+                        rh1_view.scrollRight(rh1_view.plotArea.width/10)
+                    }
                 }
-                rh1_data.append(rh1_data.count, trace[2]);
+                rh1_data.append(rh1_data.at(0).x+rh1_data.count, trace[1]);
             }
+        }
+    }
+    Button {
+        id: button2
+        z: 3
+        text: "scroll"
+        anchors.bottom: button1.bottom;
+        anchors.right: button1.left;
+        anchors.rightMargin: 8;
+        onClicked:{
+            rh1_view.scrollRight(rh1_view.width/5)
         }
     }
 }

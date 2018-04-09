@@ -32,7 +32,6 @@ private:
     MsgThread *m_parentThread;
     Hid m_hid;
     packet m_rawdata;
-    QVector<QPointF> trace_2;
     QVector<int> m_rhtrace;
     QVector<int> m_rhforce;
 
