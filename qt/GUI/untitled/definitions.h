@@ -13,8 +13,9 @@
 #define PACKET_FOOTER 0x1A
 #define DATA_SIZE_MAX 0x55
 
-typedef unsigned char * packet;
-
+typedef unsigned char * packetType;
+typedef unsigned short int uint16_t;
+typedef short int int16_t;
 typedef enum
 {
     PC   	= 0,

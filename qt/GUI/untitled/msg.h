@@ -16,10 +16,20 @@ class Msg : public QObject
 public:
     explicit Msg(MsgThread *parentThread, QObject *parent = nullptr);
 
-    int buildMsg();
+    void buildMotionCTRLMsg(uint16_t *motion, unsigned char *packet);
+    void buildFrequencCTRLMsg(uint16_t *frequence, unsigned char *packet);
+    void buildMotorStatusCTRLMsg(uint16_t *PIDpara, unsigned char *packet);
+    void buildPIDPareCTRLMsg(uint16_t *PIDpara, unsigned char *packet);
+
 
 
 private:
+    void buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet);
+    void buildMsg(unsigned char 		*data_ptr,
+                 PacketDestination	dest,
+                 PacketType			type,
+                 uint8_t 			data_size,
+                 packetType         packet);
     int isPacketValid()
     {
         return (
@@ -31,9 +41,10 @@ private:
     }
     MsgThread *m_parentThread;
     Hid m_hid;
-    packet m_rawdata;
+    packetType m_rawdata;
     QVector<int> m_rhtrace;
     QVector<int> m_rhforce;
+    packetType m_packet;
 
 
 signals:
@@ -43,6 +54,10 @@ public slots:
     void getRegularRawMsg();
     void processMsg();  //connect this with msgReceived()
     void starhid();
+
+    void sendPID(float p, float i, float d);
+    void sendFrequence(float p, float i, float d);
+    void sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4);
 };
 
 class MsgThread : public QObject
