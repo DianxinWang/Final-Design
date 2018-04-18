@@ -154,7 +154,7 @@ int main(void)
 				{
 					//motor[i].setTrace(a);
 					motor[i].pid_process();
-					motor[i].forward(100);
+					//motor[i].forward(100);
 					motor[i].start();
 				}
 				

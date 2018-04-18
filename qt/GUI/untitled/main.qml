@@ -120,7 +120,6 @@ Window {
         height: 40
         focus: true
         //verticalAlignment: Text.AlignVCenter  //垂直对齐
-        validator: DoubleValidator{bottom: 0; decimals: 10}
         font.pixelSize: 25
         //color: "#707070"
         color: "black"
