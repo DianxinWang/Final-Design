@@ -129,7 +129,7 @@ int main(void)
 	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&force,16);
 	for(int i = 0; i < 4; i++)
 	{
-		motor[i].enable();
+		motor[i].disable();
 	}
   /* USER CODE END 2 */
 
@@ -137,7 +137,6 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	static int16_t a = 0;
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -148,13 +147,11 @@ int main(void)
 				break;
 			case 0:			
 				CtrlInterv = Motor::m_interval;
-				a++;
 				//start motor functions
 				for(int i = 0; i <4; i++)
 				{
-					//motor[i].setTrace(a);
 					motor[i].pid_process();
-					//motor[i].forward(100);
+					motor[i].forward(100);
 					motor[i].start();
 				}
 				

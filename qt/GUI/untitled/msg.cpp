@@ -1,14 +1,18 @@
 #include "msg.h"
 #include <QDateTime>
-
+#include <QtConcurrent>
 
 Msg::Msg(MsgThread *parentThread, QObject *parent) :
      m_parentThread(parentThread),
      QObject(parent),
      m_hid(RH_VID, RH_PID, this),
      m_rhtrace(4),
-     m_rhforce(4)
+     m_rhforce(4),
+     m_timer(new QTimer)
 {
+    connect(this, SIGNAL(msgReceived()), this, SLOT(processMsg()),Qt::QueuedConnection);
+    connect(m_timer, SIGNAL(timeout()), this, SLOT(testPID()), Qt::QueuedConnection);
+    connect(this, SIGNAL(stoptimer()), m_timer, SLOT(stop()));
     qDebug()<<"MsgConstructor ID"<<QThread::currentThreadId();
     m_rawdata = new unsigned char[65];
     m_packet = new unsigned char[65];
@@ -18,19 +22,22 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
     ctx->addVariable("t", 0 * sizeof(double));
 }
 
+Msg::~Msg()
+{
+    stophid();
+}
 
+//tested
 void Msg::starhid()
 {
     if(m_hid.handle == NULL)
-        {//qDebug()<< "77";
-        m_hid.open(RH_VID, RH_PID);}
+    {
+        m_hid.open(RH_VID, RH_PID);
+    }
     if(m_hid.handle == NULL) return;
-    //qDebug()<< "80";
-    connect(this, &Msg::msgReceived, this, &Msg::processMsg);
-    connect(this, &Msg::startReceiv, this, &Msg::getRegularRawMsg);
-    emit(startReceiv());
+    QtConcurrent::run(this, &Msg::getRegularRawMsg);
 }
-
+//tested
 void Msg::getRegularRawMsg()
 {
     //clear previous data buffer    
@@ -58,16 +65,15 @@ void Msg::getRegularRawMsg()
         }
     }
 }
-
-void Msg::stopRegularRawMsg()
+//tested
+void Msg::stophid()
 {
     QMutexLocker locker(&m_lock);
     m_isCanRun = false;
 }
-
+//tested
 void Msg::processMsg()
 {
-    qDebug()<<"processMsg ID"<<QThread::currentThreadId();
     if(Msg::isPacketValid())
     {
         if(m_rawdata[1] == PC)
@@ -81,7 +87,6 @@ void Msg::processMsg()
                     m_rhtrace[i] = data[2*i];
                     m_rhforce[i] = data[1+2*i];
                 }
-                qDebug() << m_rhtrace[0]<<" "<<m_rhtrace[1]<<" "<<m_rhtrace[2]<<" "<<m_rhtrace[3];
                 emit(m_parentThread->traceDraw(m_rhtrace));
                 emit(m_parentThread->forceDraw(m_rhforce));
                 break;
@@ -91,30 +96,32 @@ void Msg::processMsg()
         }
     }
 }
-
+//tested
 void Msg::startTest(QString expr, int interval)
 {
-    QByteArray ba = expr.toLatin1(); // Convert to char*
+    QByteArray ba = expr.toLatin1();
     mathpresso::Error err = exp->compile(*ctx, ba.data(), mathpresso::kNoOptions);
     if (err != mathpresso::kErrorOk) {
       //printf("Expression Error: %u\n", err);
       //Todo Trigger a signal to show msg.
       return;
     }
-    m_times = 0;
-    m_timerID = this->startTimer(interval);
-}
 
-void Msg::timerEvent(QTimerEvent *event)
+    m_timer->start(interval);
+}
+//tested
+void Msg::testPID()
 {
-    if(event->timerId() == m_timerID){
-        m_times++;
-        uint16_t motion = exp->evaluate(&m_times);
-        sendMotion(motion, motion, motion, motion);
-        if(m_times == TESTTIME)
-        {
-            killTimer(m_timerID);
-        }
+
+    static double t = 0;
+    uint16_t motion = exp->evaluate(&t);
+    t++;
+    //sendMotion(motion, motion, motion, motion);
+    qDebug() << motion <<"Thread ID "<<QThread::currentThreadId();
+    if(t >= TESTTIME)
+    {
+        stoptimer();
+        t = 0;
     }
 }
 
@@ -138,13 +145,14 @@ void Msg::sendInterval(int interval)
     buildIntervalCTRLMsg(&intv, m_packet);
     m_hid.write(m_packet);  
 }
-
+//tested
 void Msg::sendEnable(int enable1, int enable2, int enable3, int enable4)
 {
     uchar enable[4] = {(uchar)(enable1 & 0xff), (uchar)(enable2 & 0xff),
                        (uchar)(enable3 & 0xff), (uchar)(enable4 & 0xff)};
     buildMotorStatusCTRLMsg((uint16_t *)enable, m_packet);
     m_hid.write(m_packet);
+    qDebug() << m_packet[0]<<m_packet[1]<<m_packet[2]<<m_packet[3]<<m_packet[4]<<m_packet[5]<<m_packet[6]<<m_packet[7]<<m_packet[8]<<m_packet[9]<<m_packet[10]<<m_packet[11]<<m_packet[12]<<m_packet[13];
 }
 
 void Msg::buildMotionCTRLMsg(uint16_t *motion, unsigned char *packet)
@@ -166,7 +174,7 @@ void Msg::buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet)
 {
     Msg::buildCMDMsg(IntervalCTRL, interval, packet);
 }
-
+//tested
 void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
 {
     int size = 0;
@@ -185,7 +193,7 @@ void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
     case MotorStatusCTRL:
         in_data[0] = type;
         memcpy(&in_data[1], data_ptr, 4);
-        size = 4;
+        size = 5;
         break;
     case IntervalCTRL:
         in_data[0] = type;
@@ -195,7 +203,7 @@ void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
     }
     Msg::buildMsg((unsigned char *)in_data, RH, CMD, size, packet);
 }
-
+//tested
 void Msg::buildMsg(unsigned char *data_ptr, PacketDestination dest, PacketType type, uint8_t data_size, unsigned char *packet)
 {
     memset(packet, 0, 65);
@@ -214,7 +222,7 @@ void Msg::buildMsg(unsigned char *data_ptr, PacketDestination dest, PacketType t
     packet[pos++] = dest ^ 0xFF;
     packet[pos++]   = PACKET_FOOTER;
 }
-
+//tested
 int Msg::isPacketValid()
 {
     return (

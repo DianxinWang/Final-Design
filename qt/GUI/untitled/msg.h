@@ -9,15 +9,18 @@
 #include <QThread>
 #include <QMutex>
 #include "mathpresso.h"
+
 QT_CHARTS_USE_NAMESPACE
+
 class MsgThread;
+
 class Msg : public QObject
 {
     Q_OBJECT
 
 public:
     explicit Msg(MsgThread *parentThread, QObject *parent = nullptr);
-
+    ~Msg();
     void buildMotionCTRLMsg(uint16_t *motion, unsigned char *packet);
     void buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet);
     void buildMotorStatusCTRLMsg(uint16_t *PIDpara, unsigned char *packet);
@@ -28,7 +31,7 @@ private:
     void buildMsg(unsigned char *data_ptr, PacketDestination dest, PacketType type\
                   , uint8_t data_size, packetType packet);
     int isPacketValid();
-    void stopRegularRawMsg();
+
 
     MsgThread *m_parentThread;
     Hid m_hid;
@@ -42,22 +45,28 @@ private:
     QMutex m_lock;
     bool m_isCanRun;
 
-    int m_timerID;
-    int m_times;
-
-protected:
-    void timerEvent(QTimerEvent *event);
+    QTimer *m_timer;
 
 
 signals:
     void msgReceived();
     void startReceiv();
+    void stoptimer();
 public slots:
-    void getRegularRawMsg();
-    void processMsg();  //connect this with msgReceived()
+    //Thread 0
     void starhid();
-
+    void stophid();
     void startTest(QString expr, int interval);
+
+
+    //Thread 1
+    void getRegularRawMsg();
+
+
+    //Thread 2
+    void processMsg();  //connect this with msgReceived()
+    void testPID();
+
     void sendPID(float p, float i, float d);
     void sendInterval(int interval);
     void sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4);

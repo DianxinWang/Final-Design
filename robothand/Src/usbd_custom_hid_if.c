@@ -255,8 +255,7 @@ static int8_t CUSTOM_HID_OutEvent_FS(uint8_t event_idx, uint8_t state)
 				break;
 			default:
 				//Todo Send Error Log
-				break;
-				
+				break;				
 		}
 	}
   return (USBD_OK);

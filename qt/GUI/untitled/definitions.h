@@ -13,7 +13,7 @@
 #define PACKET_FOOTER 0x1A
 #define DATA_SIZE_MAX 0x55
 
-#define TESTTIME 1000
+#define TESTTIME 100
 
 typedef unsigned char * packetType;
 typedef unsigned short int uint16_t;
