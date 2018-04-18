@@ -141,11 +141,11 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-		switch(CtrlInterv)
+		switch(CtrlInterv){
 			case 3:
 
 				//send log message
-
+				break;
 			case 0:			
 				CtrlInterv = Motor::m_interval;
 				a++;
@@ -163,6 +163,7 @@ int main(void)
 				BuildRH_TraceForceMsg(motor, force, msg);
 				USB_Send_64_bytes(msg);
 				break;
+			}
 			
   }
   /* USER CODE END 3 */

@@ -64,14 +64,14 @@
 int16_t dr = 0;
 unsigned char tempvar[64];
 
-static void CMD_MotorStatusCtrl(Motor *motor,unsigned char *data);
+static void CMD_MotorStatusCTRL(Motor *motor,unsigned char *data);
 static void CMD_PIDParaCTRL(Motor *motor,unsigned char *data);
 static void CMD_MotionCTRL(Motor *motor,unsigned char *data);
 static void CMD_IntervalCTRL(Motor *motor, unsigned char *data);
 
 RH_CMD_PROCESS_Itf hCMDProcessfunc = 
 {
-	CMD_MotorStatusCtrl,
+	CMD_MotorStatusCTRL,
 	CMD_PIDParaCTRL,
 	CMD_MotionCTRL,
 	CMD_IntervalCTRL
@@ -282,9 +282,9 @@ int8_t USB_Send_64_bytes(void *report)
 
 
 
-static void CMD_MotorStatusCtrl(Motor *motor, unsigned char *data)
+static void CMD_MotorStatusCTRL(Motor *motor, unsigned char *data)
 {
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < 4; i++)
 	{
 		if (data[i+1] == 1)
 			motor[i].enable();
@@ -295,7 +295,7 @@ static void CMD_MotorStatusCtrl(Motor *motor, unsigned char *data)
 
 static void CMD_PIDParaCTRL(Motor *motor, unsigned char *data)
 {
-	for(int i = 0;i < 3; i++)
+	for(int i = 0;i < 4; i++)
 	{
 		memcpy(&motor[i].m_pid, &data[1+3*sizeof(float)*i], 3*sizeof(float));
 	}
@@ -304,7 +304,7 @@ static void CMD_PIDParaCTRL(Motor *motor, unsigned char *data)
 static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
 {
 	int16_t *motion = (int16_t *) &data[1];
-	for(int i = 0;i < 3; i++)
+	for(int i = 0;i < 4; i++)
 	{
 		motor[i].setTrace(motion[i]);
 	}
@@ -314,7 +314,7 @@ static void CMD_IntervalCTRL(Motor *motor, unsigned char *data)
 {
 	uint16_t initerval = *(uint16_t *)&data[1];
 	Motor::m_interval = initerval;
-	for(int i = 0;i < 3; i++)
+	for(int i = 0;i < 4; i++)
 	{
 		motor[i].setInterval();
 	}
