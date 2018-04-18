@@ -67,14 +67,14 @@ unsigned char tempvar[64];
 static void CMD_MotorStatusCtrl(Motor *motor,unsigned char *data);
 static void CMD_PIDParaCTRL(Motor *motor,unsigned char *data);
 static void CMD_MotionCTRL(Motor *motor,unsigned char *data);
-static void CMD_FrequenceCTRL(Motor *motor, unsigned char *data);
+static void CMD_IntervalCTRL(Motor *motor, unsigned char *data);
 
 RH_CMD_PROCESS_Itf hCMDProcessfunc = 
 {
 	CMD_MotorStatusCtrl,
 	CMD_PIDParaCTRL,
 	CMD_MotionCTRL,
-	CMD_FrequenceCTRL
+	CMD_IntervalCTRL
 };
 
 /* USER CODE END PV */
@@ -310,13 +310,13 @@ static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
 	}
 }
 
-static void CMD_FrequenceCTRL(Motor *motor, unsigned char *data)
+static void CMD_IntervalCTRL(Motor *motor, unsigned char *data)
 {
 	uint16_t initerval = *(uint16_t *)&data[1];
 	Motor::m_interval = initerval;
 	for(int i = 0;i < 3; i++)
 	{
-		motor[i].setFrequence();
+		motor[i].setInterval();
 	}
 }
 

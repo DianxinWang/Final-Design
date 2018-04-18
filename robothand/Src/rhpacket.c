@@ -71,10 +71,10 @@ void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc, Motor *motor, unsigned char 
 			break;
 		/*
 		 * CMD MsgRet data structure
-		 * [MsgRet][FREQUENCE BYTE1][FREQUENCE BYTE2]
+		 * [MsgRet][INTERVAL BYTE1][INTERVAL BYTE2]
 		 *	0		1				 2
 		 */
-		case FrequencCTRL:
+		case IntervalCTRL:
 			if(data_size != 3) 
 			{
 				//Todo Buildlog

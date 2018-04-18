@@ -92,7 +92,7 @@ void Motor::setTrace(int16_t setvalue)
 	m_trace = setvalue;
 }
 
-void Motor::setFrequence()
+void Motor::setInterval()
 {
 	pid_set_frequency(&m_pid, 1000.0/m_interval);
 }

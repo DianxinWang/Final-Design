@@ -87,6 +87,56 @@ Window {
                 }
     }
 
+    TextField {
+        id: frequence
+        x: 197
+        y: 21
+        width: 108
+        height: 40
+        focus: true
+        //verticalAlignment: Text.AlignVCenter  //垂直对齐
+        validator: DoubleValidator{bottom: 0; decimals: 10}
+        font.pixelSize: 25
+        //color: "#707070"
+        color: "black"
+        font.family: "Tahoma"
+        renderType: Text.NativeRendering
+        selectionColor: "black"
+        z: 3
+        background: Rectangle {
+                    radius: 2
+                    implicitWidth: 108
+                    implicitHeight: 40
+                    border.color: "#333"
+                    border.width: 1
+        }
+    }
+
+    TextField {
+        id: expression
+        x: 385
+        y: 21
+        width: 108
+        height: 40
+        focus: true
+        //verticalAlignment: Text.AlignVCenter  //垂直对齐
+        validator: DoubleValidator{bottom: 0; decimals: 10}
+        font.pixelSize: 25
+        //color: "#707070"
+        color: "black"
+        font.family: "Tahoma"
+        renderType: Text.NativeRendering
+        selectionColor: "black"
+        z: 3
+        background: Rectangle {
+                    radius: 2
+                    implicitWidth: 108
+                    implicitHeight: 40
+                    border.color: "#333"
+                    border.width: 1
+        }
+    }
+
     ChartView {
         id: rh1_view
         z:1
@@ -118,6 +168,7 @@ Window {
         anchors.bottomMargin: 8;
         anchors.horizontalCenter: parent.horizontalCenter;
         onClicked:{
+            rhMsg.startTest()
             rhMsg.starhid()
         }
 
@@ -136,15 +187,19 @@ Window {
         }
     }
     Button {
-        id: set_hid
+        id: test
         z: 3
-        text: "set PID"
+        text: "start test"
         anchors.left: d_pid.left
         anchors.top: d_pid.bottom
         anchors.topMargin: 8
         onClicked: {
-
-            parseFloat(p_pid.text)
+            var p = parseFloat(p_pid.text)
+            var i = parseFloat(i_pid.text)
+            var d = parseFloat(d_pid.text)
+            var interv = parseInt(frequence.text)
+            rhMsg.sendPID(p, i, d)
+            rhMsg.sendInterval(interv)
         }
     }
 }

@@ -13,6 +13,8 @@
 #define PACKET_FOOTER 0x1A
 #define DATA_SIZE_MAX 0x55
 
+#define TESTTIME 1000
+
 typedef unsigned char * packetType;
 typedef unsigned short int uint16_t;
 typedef short int int16_t;
@@ -44,7 +46,7 @@ typedef enum
     MotorStatusCTRL = 0,
     PIDParaCTRL  	= 1,
     MotionCTRL		= 2,
-    FrequencCTRL	= 3,
+    IntervalCTRL	= 3,
 } CMDType;
 
 typedef enum

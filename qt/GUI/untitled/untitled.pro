@@ -7,7 +7,6 @@ CONFIG += c++11
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-DEFINES += QT_CHARTS_USE_NAMESPACE
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -16,9 +15,9 @@ DEFINES += QT_CHARTS_USE_NAMESPACE
 
 SOURCES += \
         main.cpp \
-    hid.cpp \
-    hidapi.c \
-    msg.cpp
+    msg.cpp \
+    hid.cpp
+
 
 RESOURCES += qml.qrc
 
@@ -37,4 +36,18 @@ HEADERS += \
     hid.h \
     hidapi.h \
     definitions.h \
-    msg.h
+    msg.h \
+    mathpresso.h
+
+
+
+win32: LIBS += -L$$PWD/./ -lmathpresso
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.
+
+
+win32: LIBS += -L$$PWD/./ -lhidapi
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.

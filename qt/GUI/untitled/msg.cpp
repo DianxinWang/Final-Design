@@ -1,6 +1,7 @@
 #include "msg.h"
 #include <QDateTime>
 
+
 Msg::Msg(MsgThread *parentThread, QObject *parent) :
      m_parentThread(parentThread),
      QObject(parent),
@@ -11,6 +12,10 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
     qDebug()<<"MsgConstructor ID"<<QThread::currentThreadId();
     m_rawdata = new unsigned char[65];
     m_packet = new unsigned char[65];
+    ctx = new mathpresso::Context;
+    exp = new mathpresso::Expression;
+    ctx->addBuiltIns();
+    ctx->addVariable("t", 0 * sizeof(double));
 }
 
 
@@ -31,19 +36,33 @@ void Msg::getRegularRawMsg()
     //clear previous data buffer    
     qDebug()<<"Receiving ID"<<QThread::currentThreadId();
     int state;
+    m_isCanRun = true;
     for(;;)
     {
         state = m_hid.read_wait(m_rawdata,0);
         if(state == -1) return;
         else if(state == 0) break;
     }
-    //m_hid.set_nonblocking(0);
+
     for(;;)
     {
         state = m_hid.read(m_rawdata);
         if(state == -1) return;
         else if(state > 0) emit(msgReceived());
+        {
+            QMutexLocker locker(&m_lock);
+            if(!m_isCanRun)//check if keeping running
+            {
+                return;
+            }
+        }
     }
+}
+
+void Msg::stopRegularRawMsg()
+{
+    QMutexLocker locker(&m_lock);
+    m_isCanRun = false;
 }
 
 void Msg::processMsg()
@@ -73,6 +92,32 @@ void Msg::processMsg()
     }
 }
 
+void Msg::startTest(QString expr, int interval)
+{
+    QByteArray ba = expr.toLatin1(); // Convert to char*
+    mathpresso::Error err = exp->compile(*ctx, ba.data(), mathpresso::kNoOptions);
+    if (err != mathpresso::kErrorOk) {
+      //printf("Expression Error: %u\n", err);
+      //Todo Trigger a signal to show msg.
+      return;
+    }
+    m_times = 0;
+    m_timerID = this->startTimer(interval);
+}
+
+void Msg::timerEvent(QTimerEvent *event)
+{
+    if(event->timerId() == m_timerID){
+        m_times++;
+        uint16_t motion = exp->evaluate(&m_times);
+        sendMotion(motion, motion, motion, motion);
+        if(m_times == TESTTIME)
+        {
+            killTimer(m_timerID);
+        }
+    }
+}
+
 void Msg::sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4)
 {
     uint16_t motion[4] = {motion1, motion2, motion3, motion4};
@@ -82,23 +127,23 @@ void Msg::sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint1
 
 void Msg::sendPID(float p, float i, float d)
 {
-    float pid[3] = {p,i,d};
+    float pid[12] = {p,i,d,p,i,d,p,i,d,p,i,d};
     buildPIDPareCTRLMsg((uint16_t *)pid, m_packet);
     m_hid.write(m_packet);
 }
 
-void Msg::sendFrequence(int frequence)
+void Msg::sendInterval(int interval)
 {
-    uint16_t freq = (uint16)(frequence & 0xffff);
-    buildFrequencCTRLMsg(&freq, m_packet);
-    m_hid.write(m_packet);
+    uint16_t intv = (uint16_t)(interval & 0xffff);
+    buildIntervalCTRLMsg(&intv, m_packet);
+    m_hid.write(m_packet);  
 }
 
 void Msg::sendEnable(int enable1, int enable2, int enable3, int enable4)
 {
     uchar enable[4] = {(uchar)(enable1 & 0xff), (uchar)(enable2 & 0xff),
-                       (uchar)(enable3 & 0xff), (uchar)(enable1 & 0xff)};
-    buildMotorStatusCTRLMsg(enable, m_packet);
+                       (uchar)(enable3 & 0xff), (uchar)(enable4 & 0xff)};
+    buildMotorStatusCTRLMsg((uint16_t *)enable, m_packet);
     m_hid.write(m_packet);
 }
 
@@ -117,9 +162,9 @@ void Msg::buildMotorStatusCTRLMsg(uint16_t *status, unsigned char *packet)
     Msg::buildCMDMsg(MotorStatusCTRL, status, packet);
 }
 
-void Msg::buildFrequencCTRLMsg(uint16_t *frequence, unsigned char *packet)
+void Msg::buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet)
 {
-    Msg::buildCMDMsg(FrequencCTRL, frequence, packet);
+    Msg::buildCMDMsg(IntervalCTRL, interval, packet);
 }
 
 void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
@@ -142,7 +187,7 @@ void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
         memcpy(&in_data[1], data_ptr, 4);
         size = 4;
         break;
-    case FrequencCTRL:
+    case IntervalCTRL:
         in_data[0] = type;
         memcpy(&in_data[1], data_ptr, 2);
         size = 3;
@@ -168,4 +213,14 @@ void Msg::buildMsg(unsigned char *data_ptr, PacketDestination dest, PacketType t
     packet[pos++] = type ^ 0xFF;
     packet[pos++] = dest ^ 0xFF;
     packet[pos++]   = PACKET_FOOTER;
+}
+
+int Msg::isPacketValid()
+{
+    return (
+        m_rawdata[0] == PACKET_HEADER &&
+        m_rawdata[3] <= DATA_SIZE_MAX &&
+        m_rawdata[1] == (m_rawdata[m_rawdata[3]+5] ^ 0xFF) &&
+        m_rawdata[2] == (m_rawdata[m_rawdata[3]+4] ^ 0xFF) &&
+        m_rawdata[m_rawdata[3]+6] == PACKET_FOOTER);
 }

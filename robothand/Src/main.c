@@ -141,24 +141,29 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	while (CtrlInterv <= 0)
-		{
-			CtrlInterv = Motor::m_interval;
-			a++;
-			//start motor functions
-			for(int i = 0; i <4; i++)
-			{
-				//motor[i].setTrace(a);
-				motor[i].pid_process();
-				motor[i].forward(100);
-				motor[i].start();
-			}
+		switch(CtrlInterv)
+			case 3:
+
+				//send log message
+
+			case 0:			
+				CtrlInterv = Motor::m_interval;
+				a++;
+				//start motor functions
+				for(int i = 0; i <4; i++)
+				{
+					//motor[i].setTrace(a);
+					motor[i].pid_process();
+					motor[i].forward(100);
+					motor[i].start();
+				}
+				
+				
+				//sending report to PC
+				BuildRH_TraceForceMsg(motor, force, msg);
+				USB_Send_64_bytes(msg);
+				break;
 			
-			
-			//sending report to PC
-			BuildRH_TraceForceMsg(motor, force, msg);
-			USB_Send_64_bytes(msg);
-		}	
   }
   /* USER CODE END 3 */
 

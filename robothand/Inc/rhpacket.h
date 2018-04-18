@@ -47,7 +47,7 @@ typedef enum
 	MotorStatusCTRL = 0,
 	PIDParaCTRL  	= 1,
 	MotionCTRL		= 2,
-	FrequencCTRL	= 3,
+	IntervalCTRL	= 3,
 } CMDType;
 
 typedef enum

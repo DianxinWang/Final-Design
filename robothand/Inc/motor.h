@@ -39,7 +39,7 @@ public:
 	void setDutyratio(int8_t dutyratio);
 	void getEncoderValue();
 	void setTrace(int16_t setvalue);
-	void setFrequence();
+	void setInterval();
 	int8_t getDutyRatio();
 private:
 	void setPWM(uint32_t Channel,uint8_t value);

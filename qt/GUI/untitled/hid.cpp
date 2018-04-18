@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <qDebug>
-Hid::Hid(QObject *parent)
+
+Hid::Hid(QObject *parent):
+    QObject(parent)
 {
     Hid::init();
 }
