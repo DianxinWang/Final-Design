@@ -10,7 +10,7 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
      m_rhforce(4),
      m_timer(new QTimer)
 {
-    connect(this, SIGNAL(msgReceived()), this, SLOT(processMsg()),Qt::QueuedConnection);
+    connect(this, SIGNAL(msgReceived()), this, SLOT(processMsg()),Qt::DirectConnection);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(testPID()), Qt::QueuedConnection);
     connect(this, SIGNAL(stoptimer()), m_timer, SLOT(stop()));
     qDebug()<<"MsgConstructor ID"<<QThread::currentThreadId();
@@ -55,7 +55,7 @@ void Msg::getRegularRawMsg()
     {
         state = m_hid.read(m_rawdata);
         if(state == -1) return;
-        else if(state > 0) emit(msgReceived());
+        else if(state > 0) emit msgReceived();
         {
             QMutexLocker locker(&m_lock);
             if(!m_isCanRun)//check if keeping running
@@ -116,7 +116,7 @@ void Msg::testPID()
     static double t = 0;
     uint16_t motion = exp->evaluate(&t);
     t++;
-    //sendMotion(motion, motion, motion, motion);
+    sendMotion(motion, motion, motion, motion);
     qDebug() << motion <<"Thread ID "<<QThread::currentThreadId();
     if(t >= TESTTIME)
     {
@@ -124,21 +124,21 @@ void Msg::testPID()
         t = 0;
     }
 }
-
+//tested
 void Msg::sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4)
 {
     uint16_t motion[4] = {motion1, motion2, motion3, motion4};
     buildMotionCTRLMsg(motion, m_packet);
     m_hid.write(m_packet);
 }
-
+//tested
 void Msg::sendPID(float p, float i, float d)
 {
     float pid[12] = {p,i,d,p,i,d,p,i,d,p,i,d};
     buildPIDPareCTRLMsg((uint16_t *)pid, m_packet);
     m_hid.write(m_packet);
 }
-
+//tested
 void Msg::sendInterval(int interval)
 {
     uint16_t intv = (uint16_t)(interval & 0xffff);
@@ -154,22 +154,22 @@ void Msg::sendEnable(int enable1, int enable2, int enable3, int enable4)
     m_hid.write(m_packet);
     qDebug() << m_packet[0]<<m_packet[1]<<m_packet[2]<<m_packet[3]<<m_packet[4]<<m_packet[5]<<m_packet[6]<<m_packet[7]<<m_packet[8]<<m_packet[9]<<m_packet[10]<<m_packet[11]<<m_packet[12]<<m_packet[13];
 }
-
+//tested
 void Msg::buildMotionCTRLMsg(uint16_t *motion, unsigned char *packet)
 {
     Msg::buildCMDMsg(MotionCTRL, motion, packet);
 }
-
+//tested
 void Msg::buildPIDPareCTRLMsg(uint16_t *PIDpara, unsigned char *packet)
 {
     Msg::buildCMDMsg(PIDParaCTRL, PIDpara, packet);
 }
-
+//tested
 void Msg::buildMotorStatusCTRLMsg(uint16_t *status, unsigned char *packet)
 {
     Msg::buildCMDMsg(MotorStatusCTRL, status, packet);
 }
-
+//tested
 void Msg::buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet)
 {
     Msg::buildCMDMsg(IntervalCTRL, interval, packet);

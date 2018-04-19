@@ -8,7 +8,7 @@ void pid_init(pid_ctrl_t *pid)
     //pid_set_gains(pid, 1., 0., 0.);
     pid->integrator = 0.;
     pid->previous_error = 0.;
-    pid->integrator_limit = INFINITY;
+    pid->integrator_limit = 200;
     pid->frequency = 1.;
 }
 

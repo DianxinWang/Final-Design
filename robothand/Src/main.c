@@ -151,7 +151,7 @@ int main(void)
 				for(int i = 0; i <4; i++)
 				{
 					motor[i].pid_process();
-					motor[i].forward(100);
+					//motor[i].forward(100);
 					motor[i].start();
 				}
 				

@@ -19,7 +19,7 @@ Window {
         width: 108
         height: 40
         focus: true
-        text: "0.01"
+        text: "0.003"
         //verticalAlignment: Text.AlignVCenter  //垂直对齐
         font.pixelSize: 25
         validator: DoubleValidator{bottom: 0; decimals: 10}
@@ -45,7 +45,7 @@ Window {
         width: 108
         height: 40
         focus: true
-        text: "0.002"
+        text: "0.0002"
         //verticalAlignment: Text.AlignVCenter  //垂直对齐
         validator: DoubleValidator{bottom: 0; decimals: 10}
         font.pixelSize: 25
@@ -189,6 +189,20 @@ Window {
             }
         }
     }
+
+    Button {
+        id: stophid
+        z: 3
+        text: "stop hid"
+        anchors.leftMargin: 92
+        anchors.left: d_pid.left
+        anchors.top: d_pid.bottom
+        anchors.topMargin: 279
+        onClicked: {
+            rhMsg.stophid()
+        }
+    }
+
     Button {
         id: test
         z: 3
@@ -202,22 +216,10 @@ Window {
             var i = parseFloat(i_pid.text)
             var d = parseFloat(d_pid.text)
             var interv = parseInt(interval.text)
-            //rhMsg.sendEnable(0,0,1,0)
-            //rhMsg.sendPID(p, i, d)
-            //rhMsg.sendInterval(interv)
+            rhMsg.sendEnable(0,0,1,0)
+            rhMsg.sendPID(p, i, d)
+            rhMsg.sendInterval(interv)
             rhMsg.startTest(expression.text, interv)
         }
     }
-    Button {
-        id: stophid
-        z: 3
-        text: "stop hid"
-        anchors.leftMargin: 92
-        anchors.left: d_pid.left
-        anchors.top: d_pid.bottom
-        anchors.topMargin: 279
-        onClicked: {
-            rhMsg.stophid()
-        }
-    }
-}
+   }
