@@ -80,7 +80,20 @@ void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc, Motor *motor, unsigned char 
 				//Todo Buildlog
 				break;
 			}
-			hCMDProcessfunc.frequencCTRL(motor, data);
+			hCMDProcessfunc.intervalCTRL(motor, data);
+			break;
+		/*
+		 * CMD MsgRet data structure
+		 * [MsgRet][INTELIMIT BYTE1][INTERVAL BYTE2][INTELIMIT BYTE3][INTERVAL BYTE4]
+		 *	0		1				 2
+		 */
+		case InteLimitCTRL:
+			if(data_size != 5) 
+			{
+				//Todo Buildlog
+				break;
+			}
+			hCMDProcessfunc.inteLimitCTRL(motor, data);
 			break;
 		default:
 			break;

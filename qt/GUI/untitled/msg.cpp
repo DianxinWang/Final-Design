@@ -8,6 +8,7 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
      m_hid(RH_VID, RH_PID, this),
      m_rhtrace(4),
      m_rhforce(4),
+     m_rhsetTrace(4),
      m_timer(new QTimer)
 {
     connect(this, SIGNAL(msgReceived()), this, SLOT(processMsg()),Qt::DirectConnection);
@@ -24,6 +25,7 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
 
 Msg::~Msg()
 {
+    emit stoptimer();
     stophid();
 }
 
@@ -87,7 +89,7 @@ void Msg::processMsg()
                     m_rhtrace[i] = data[2*i];
                     m_rhforce[i] = data[1+2*i];
                 }
-                emit(m_parentThread->traceDraw(m_rhtrace));
+                emit(m_parentThread->traceDraw(m_rhtrace, m_rhsetTrace));
                 emit(m_parentThread->forceDraw(m_rhforce));
                 break;
             case DG_FORCE_BENCH_MSG:
@@ -99,6 +101,8 @@ void Msg::processMsg()
 //tested
 void Msg::startTest(QString expr, int interval)
 {
+    if(!m_timer->isActive())
+    {
     QByteArray ba = expr.toLatin1();
     mathpresso::Error err = exp->compile(*ctx, ba.data(), mathpresso::kNoOptions);
     if (err != mathpresso::kErrorOk) {
@@ -106,8 +110,8 @@ void Msg::startTest(QString expr, int interval)
       //Todo Trigger a signal to show msg.
       return;
     }
-
     m_timer->start(interval);
+    }
 }
 //tested
 void Msg::testPID()
@@ -117,16 +121,16 @@ void Msg::testPID()
     uint16_t motion = exp->evaluate(&t);
     t++;
     sendMotion(motion, motion, motion, motion);
-    qDebug() << motion <<"Thread ID "<<QThread::currentThreadId();
     if(t >= TESTTIME)
     {
-        stoptimer();
+        emit stoptimer();
         t = 0;
     }
 }
 //tested
 void Msg::sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4)
 {
+    m_rhsetTrace = {motion1, motion2, motion3, motion4};
     uint16_t motion[4] = {motion1, motion2, motion3, motion4};
     buildMotionCTRLMsg(motion, m_packet);
     m_hid.write(m_packet);
@@ -152,7 +156,13 @@ void Msg::sendEnable(int enable1, int enable2, int enable3, int enable4)
                        (uchar)(enable3 & 0xff), (uchar)(enable4 & 0xff)};
     buildMotorStatusCTRLMsg((uint16_t *)enable, m_packet);
     m_hid.write(m_packet);
-    qDebug() << m_packet[0]<<m_packet[1]<<m_packet[2]<<m_packet[3]<<m_packet[4]<<m_packet[5]<<m_packet[6]<<m_packet[7]<<m_packet[8]<<m_packet[9]<<m_packet[10]<<m_packet[11]<<m_packet[12]<<m_packet[13];
+}
+
+void Msg::sendInteLimit(float intelimit)
+{
+    buildInteLimitCTRLMsg((uint16_t *)&intelimit, m_packet);
+    qDebug()<<*(float *)&m_packet[6];
+    m_hid.write(m_packet);
 }
 //tested
 void Msg::buildMotionCTRLMsg(uint16_t *motion, unsigned char *packet)
@@ -173,6 +183,11 @@ void Msg::buildMotorStatusCTRLMsg(uint16_t *status, unsigned char *packet)
 void Msg::buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet)
 {
     Msg::buildCMDMsg(IntervalCTRL, interval, packet);
+}
+
+void Msg::buildInteLimitCTRLMsg(uint16_t *intelimit, unsigned char *packet)
+{
+    Msg::buildCMDMsg(InteLimitCTRL, intelimit, packet);
 }
 //tested
 void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
@@ -199,6 +214,11 @@ void Msg::buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet)
         in_data[0] = type;
         memcpy(&in_data[1], data_ptr, 2);
         size = 3;
+        break;
+    case InteLimitCTRL:
+        in_data[0] = type;
+        memcpy(&in_data[1], data_ptr, 4);
+        size = 5;
         break;
     }
     Msg::buildMsg((unsigned char *)in_data, RH, CMD, size, packet);

@@ -5,11 +5,11 @@
 
 void pid_init(pid_ctrl_t *pid)
 {
-    //pid_set_gains(pid, 1., 0., 0.);
+    pid_set_gains(pid, 0.01, 0.002, 0.);
     pid->integrator = 0.;
     pid->previous_error = 0.;
-    pid->integrator_limit = 200;
-    pid->frequency = 1.;
+    pid->integrator_limit = INFINITY;
+    pid->frequency = 100.;
 }
 
 void pid_set_gains(pid_ctrl_t *pid, float kp, float ki, float kd)

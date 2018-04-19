@@ -99,6 +99,11 @@ void Motor::setInterval()
 	pid_set_frequency(&m_pid, 1000.0/m_interval);
 }
 
+void Motor::setInteLimit(float intelimit)
+{
+	pid_set_integral_limit(&m_pid, intelimit);
+}
+
 void Motor::pid_process()
 {
 	this->getEncoderValue();

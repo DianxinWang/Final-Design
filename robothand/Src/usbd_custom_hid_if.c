@@ -68,13 +68,15 @@ static void CMD_MotorStatusCTRL(Motor *motor,unsigned char *data);
 static void CMD_PIDParaCTRL(Motor *motor,unsigned char *data);
 static void CMD_MotionCTRL(Motor *motor,unsigned char *data);
 static void CMD_IntervalCTRL(Motor *motor, unsigned char *data);
+static void CMD_InteLimitCTRL(Motor *motor, unsigned char *data);
 
 RH_CMD_PROCESS_Itf hCMDProcessfunc = 
 {
 	CMD_MotorStatusCTRL,
 	CMD_PIDParaCTRL,
 	CMD_MotionCTRL,
-	CMD_IntervalCTRL
+	CMD_IntervalCTRL,
+	CMD_InteLimitCTRL,
 };
 
 /* USER CODE END PV */
@@ -311,15 +313,23 @@ static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
 
 static void CMD_IntervalCTRL(Motor *motor, unsigned char *data)
 {
-	uint16_t initerval = *(uint16_t *)&data[1];
-	Motor::m_interval = initerval;
+	uint16_t interval = *(uint16_t *)&data[1];
+	Motor::m_interval = interval;
 	for(int i = 0;i < 4; i++)
 	{
 		motor[i].setInterval();
 	}
 }
 
-
+static void CMD_InteLimitCTRL(Motor *motor, unsigned char *data)
+{
+	float intelimit;
+	memcpy(&intelimit, &data[1], sizeof(float));
+	for(int i = 0;i < 4; i++)
+	{
+		motor[i].setInteLimit(intelimit);
+	}
+}
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 /**

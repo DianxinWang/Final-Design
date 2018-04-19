@@ -139,29 +139,22 @@ int main(void)
   {
   /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
-		switch(CtrlInterv){
-			case 3:
-
-				//send log message
-				break;
-			case 0:			
-				CtrlInterv = Motor::m_interval;
-				//start motor functions
-				for(int i = 0; i <4; i++)
-				{
-					motor[i].pid_process();
-					//motor[i].forward(100);
-					motor[i].start();
-				}
-				
-				
-				//sending report to PC
-				BuildRH_TraceForceMsg(motor, force, msg);
-				USB_Send_64_bytes(msg);
-				break;
+	/* USER CODE BEGIN 3 */
+		if(CtrlInterv <= 0)
+		{	
+			CtrlInterv = Motor::m_interval;
+			//start motor functions
+			for(int i = 0; i <4; i++)
+			{
+				motor[i].pid_process();
+				motor[i].start();
 			}
-			
+				
+				
+			//sending report to PC
+			BuildRH_TraceForceMsg(motor, force, msg);
+			USB_Send_64_bytes(msg);
+		}			
   }
   /* USER CODE END 3 */
 

@@ -48,6 +48,7 @@ typedef enum
 	PIDParaCTRL  	= 1,
 	MotionCTRL		= 2,
 	IntervalCTRL	= 3,
+	InteLimitCTRL = 4,
 } CMDType;
 
 typedef enum
@@ -61,7 +62,8 @@ typedef struct
 	void (* motorStatCtrlFunc)(Motor *,unsigned char *);
 	void (* pidParaCTRL)(Motor *,unsigned char *);
 	void (* motionCTRL)(Motor *,unsigned char *);
-	void (* frequencCTRL)(Motor *,unsigned char *);
+	void (* intervalCTRL)(Motor *,unsigned char *);
+	void (* inteLimitCTRL)(Motor *,unsigned char *);
 } RH_CMD_PROCESS_Itf;
 
 int IsPacketValid(unsigned char *packet);

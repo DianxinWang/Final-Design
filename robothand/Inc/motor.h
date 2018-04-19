@@ -40,6 +40,7 @@ public:
 	void getEncoderValue();
 	void setTrace(int16_t setvalue);
 	void setInterval();
+	void setInteLimit(float intelimit);
 	int8_t getDutyRatio();
 private:
 	void setPWM(uint32_t Channel,uint8_t value);

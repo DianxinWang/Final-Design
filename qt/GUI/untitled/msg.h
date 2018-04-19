@@ -25,6 +25,7 @@ public:
     void buildIntervalCTRLMsg(uint16_t *interval, unsigned char *packet);
     void buildMotorStatusCTRLMsg(uint16_t *PIDpara, unsigned char *packet);
     void buildPIDPareCTRLMsg(uint16_t *PIDpara, unsigned char *packet);
+    void buildInteLimitCTRLMsg(uint16_t *intelimit, unsigned char *packet);
 
 private:
     void buildCMDMsg(CMDType type, uint16_t *data_ptr, unsigned char *packet);
@@ -37,6 +38,7 @@ private:
     Hid m_hid;
     packetType m_rawdata;
     QVector<int> m_rhtrace;
+    QVector<int> m_rhsetTrace;
     QVector<int> m_rhforce;
     packetType m_packet;
 
@@ -67,6 +69,7 @@ public slots:
     void processMsg();  //connect this with msgReceived()
     void testPID();
 
+    void sendInteLimit(float intelimit);
     void sendPID(float p, float i, float d);
     void sendInterval(int interval);
     void sendMotion(uint16_t motion1, uint16_t motion2, uint16_t motion3, uint16_t motion4);
@@ -92,7 +95,7 @@ public:
     Msg *m_msg;
 public slots:
 signals:
-    void traceDraw(const QVector<int> &trace);
+    void traceDraw(const QVector<int> &realtrace, const QVector<int> &idealtrace);
     void forceDraw(const QVector<int> &force);
 };
 #endif // MSGPROCESS_H
