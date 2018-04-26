@@ -27,6 +27,7 @@ void Motor::enable()
 {
 	HAL_GPIO_WritePin(m_MGPIOx, m_MGPIO_Pin, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(m_EGPIOx, m_EGPIO_Pin, GPIO_PIN_SET);//Todo delete
+	//pid_init(&m_pid);
 	HAL_TIM_Encoder_Start(m_Ehtim, TIM_CHANNEL_ALL);
 }
 void Motor::disable()

@@ -63,7 +63,7 @@ public:
 	static uint16_t	m_interval;
 	pid_ctrl_t      m_pid;
 	int16_t 				m_EncValue;
-	int16_t					m_trace;
+	float					  m_trace;
 };
 
 #ifdef __cplusplus

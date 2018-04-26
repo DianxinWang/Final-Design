@@ -10,7 +10,9 @@ int IsPacketValid(unsigned char *packet)
 		packet[packet[3]+6] == PACKET_FOOTER);
 }
 
-PacketType GetPacketInfo(unsigned char *packet, unsigned char **data, uint8_t *data_size)
+PacketType GetPacketInfo(unsigned char *packet, 
+						unsigned char **data, 
+						uint8_t *data_size)
 {
 	*data = &packet[4];
 	*data_size = packet[3];
@@ -26,7 +28,10 @@ static PacketType GetPacketType(unsigned char *packet)
  * CMD inner data structure
  * [Inner Type][data 1][data 2]....[data n]
  */
-void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc, Motor *motor, unsigned char *data, uint8_t data_size)
+void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc, 
+				Motor *motor, 
+				unsigned char *data, 
+				uint8_t data_size)
 {
 	switch (data[0])
 	{
@@ -125,8 +130,10 @@ void BuildMsg(	unsigned char 		*data_ptr,
 
 /*
  * ForceTraceMsg data structure
- * [Motor 1 Trace byte 1][Motor 1 Trace byte 2][Motor 1 Force byte 22]
+ * [Motor 1 Trace byte 1][Motor 1 Trace byte 2][Motor 1 Force byte 1]
  *	0					  1						2
+ * [Motor 1 Force byte 2]...[Motor 4 Force byte 1][Motor 4 Force byte 2]
+ *  3                        14                    15
  */
 void BuildRH_TraceForceMsg(
 	Motor				*motor,
@@ -144,3 +151,28 @@ void BuildRH_TraceForceMsg(
 	BuildMsg(data, PC, RH_TRACE_FORCE_MSG, 16, packet);
 }	
 
+/*
+ * EMGBendForceMsg data structure
+ * [EMG channel1 byte 1][EMG channel1 byte 2][EMG channel2 byte 1]...
+    0                     1                    2 
+   [EMG channel4 byte 2]|Same structure as before|[Bend channel byte1]...
+    7                     31                       32                     
+   [Bend channe5 byte2][Forece channel byte1]...[Force channel5 byte2]
+ *  41                   42                      51
+ */
+void BuildDG_EMGBendForceMsg(
+	uint16_t			*EMG,
+	uint16_t			*Bend,
+	uint16_t			*Force,
+	unsigned char 		*packet)
+{
+	uint8_t pos = 0;
+	uint8_t data[DATA_SIZE_MAX];
+	memset(data, 0, DATA_SIZE_MAX);
+	memcpy(data+pos, EMG, 32);
+	pos += 32;
+	memcpy(data+pos, Bend, 10);
+	pos += 10;
+	memcpy(data+pos, Force, 10);
+//	BuildMsg(data, PC, DG_EMG_FORCE_BENCH_MSG, 52, packet);
+}

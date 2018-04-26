@@ -8,12 +8,12 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
      m_hid(RH_VID, RH_PID, this),
      m_rhtrace(4),
      m_rhforce(4),
-     m_rhsetTrace(4),
-     m_timer(new QTimer)
+     m_rhsetTrace(4)
+    // m_timer(new QTimer)
 {
     connect(this, SIGNAL(msgReceived()), this, SLOT(processMsg()),Qt::DirectConnection);
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(testPID()), Qt::QueuedConnection);
-    connect(this, SIGNAL(stoptimer()), m_timer, SLOT(stop()));
+//    connect(m_timer, SIGNAL(timeout()), this, SLOT(testPID()), Qt::QueuedConnection);
+//    connect(this, SIGNAL(stoptimer()), m_timer, SLOT(stop()));
     qDebug()<<"MsgConstructor ID"<<QThread::currentThreadId();
     m_rawdata = new unsigned char[65];
     m_packet = new unsigned char[65];
@@ -25,7 +25,7 @@ Msg::Msg(MsgThread *parentThread, QObject *parent) :
 
 Msg::~Msg()
 {
-    emit stoptimer();
+    //emit stoptimer();
     stophid();
 }
 
@@ -92,17 +92,15 @@ void Msg::processMsg()
                 emit(m_parentThread->traceDraw(m_rhtrace, m_rhsetTrace));
                 emit(m_parentThread->forceDraw(m_rhforce));
                 break;
-            case DG_FORCE_BENCH_MSG:
+            case DG_EMG_FORCE_BENCH_MSG:
                 break;
             }
         }
     }
 }
 //tested
-void Msg::startTest(QString expr, int interval)
+void Msg::startTest(QString expr)
 {
-    if(!m_timer->isActive())
-    {
     QByteArray ba = expr.toLatin1();
     mathpresso::Error err = exp->compile(*ctx, ba.data(), mathpresso::kNoOptions);
     if (err != mathpresso::kErrorOk) {
@@ -110,8 +108,7 @@ void Msg::startTest(QString expr, int interval)
       //Todo Trigger a signal to show msg.
       return;
     }
-    m_timer->start(interval);
-    }
+    connect(this, SIGNAL(msgReceived()), this, SLOT(testPID()));
 }
 //tested
 void Msg::testPID()
@@ -123,7 +120,8 @@ void Msg::testPID()
     sendMotion(motion, motion, motion, motion);
     if(t >= TESTTIME)
     {
-        emit stoptimer();
+        disconnect(this, SIGNAL(msgReceived()), this, SLOT(testPID()));
+        //emit stoptimer();
         t = 0;
     }
 }

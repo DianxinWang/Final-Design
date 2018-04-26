@@ -47,18 +47,18 @@ private:
     QMutex m_lock;
     bool m_isCanRun;
 
-    QTimer *m_timer;
+//    QTimer *m_timer;
 
 
 signals:
     void msgReceived();
     void startReceiv();
-    void stoptimer();
+//    void stoptimer();
 public slots:
     //Thread 0
     void starhid();
     void stophid();
-    void startTest(QString expr, int interval);
+    void startTest(QString expr);
 
 
     //Thread 1

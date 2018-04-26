@@ -53,3 +53,5 @@ win32: LIBS += -L$$PWD/./ -lhidapi
 
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
+
+DISTFILES +=

@@ -6,8 +6,8 @@
 #define RH_VID 1024
 #define RH_PID 22140
 
-#define DG_VID 0x000
-#define DG_PID 0x000
+#define DG_VID 1023
+#define DG_PID 22140
 
 #define PACKET_HEADER 0x1A
 #define PACKET_FOOTER 0x1A
@@ -37,7 +37,7 @@ typedef enum
 
     RH_TRACE_FORCE_MSG	= 5,
 
-    DG_FORCE_BENCH_MSG	= 6,
+    DG_EMG_FORCE_BENCH_MSG	= 6,
 
 } PacketType;
 
