@@ -145,7 +145,7 @@ extern "C" {
 			(PID) and optionally a serial number.
 
 			If @p serial_number is NULL, the first device with the
-			specified VID and PID is opened.
+            specified VID and PID is opened.w
 
 			@ingroup API
 			@param vendor_id The Vendor ID (VID) of the device to open.

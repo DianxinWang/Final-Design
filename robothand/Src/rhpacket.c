@@ -54,7 +54,7 @@ void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc,
 		 *	0						 1						 					 4					     				12						 					48
 		 */
 		case PIDParaCTRL:
-			if(data_size != 49) 
+			if(data_size != 14) 
 			{
 				//Todo Buildlog
 				break;
@@ -100,6 +100,13 @@ void ProcessCMD(RH_CMD_PROCESS_Itf hCMDProcessfunc,
 			}
 			hCMDProcessfunc.inteLimitCTRL(motor, data);
 			break;
+		case RH_StatusRET:
+			if(data_size != 1)
+			{
+				break;
+			}
+			hCMDProcessfunc.rhstatusRET(motor, data);
+			break;
 		default:
 			break;
 	}
@@ -137,18 +144,21 @@ void BuildMsg(	unsigned char 		*data_ptr,
  */
 void BuildRH_TraceForceMsg(
 	Motor				*motor,
-	uint16_t			*adc,
+	uint8_t			*adc,
 	unsigned char 		*packet)
 {
 	uint8_t pos = 0;
-	uint8_t data[DATA_SIZE_MAX];
+	uint16_t data[DATA_SIZE_MAX];
 	for(int i = 0; i < 4; i++)
 	{
-		((uint16_t *)data)[pos++] = motor[i].m_EncValue;
-		((uint16_t *)data)[pos++] = adc[i];
+		data[pos++] = motor[i].m_EncValue;
+	}
+		for(int i = 0; i < 4; i++)
+	{
+		data[pos++] = adc[i]<<8u;
 	}
 	
-	BuildMsg(data, PC, RH_TRACE_FORCE_MSG, 16, packet);
+	BuildMsg((uint8_t *)data, PC, RH_TRACE_FORCE_MSG, 16, packet);
 }	
 
 /*
@@ -176,3 +186,27 @@ void BuildDG_EMGBendForceMsg(
 	memcpy(data+pos, Force, 10);
 //	BuildMsg(data, PC, DG_EMG_FORCE_BENCH_MSG, 52, packet);
 }
+
+/*
+ * StatusMsg data structure
+ * [Motor 1 PID_P byte 1][Motor 1 PID_P byte 2][Motor 1 PID_P byte 3]
+ *	0					  1						2                    3
+ * [Motor 1 PID_P byte 4]...[Motor Interval byte 1][Motor Interval byte 2]
+ *  4                        48                      49
+ */
+void BuildRH_StatusMsg(
+	Motor				*motor,
+	unsigned char 		*packet)
+{
+	uint8_t pos = 0;
+	float data[DATA_SIZE_MAX];
+	for(int i = 0; i < 4; i++)
+	{
+		data[pos++] = motor[i].m_pid.kp;
+		data[pos++] = motor[i].m_pid.ki;
+		data[pos++] = motor[i].m_pid.kd;
+	}
+	memcpy(data+pos,&Motor::m_interval,2);
+	
+	BuildMsg((uint8_t *)data, PC, RH_Status, 50, packet);
+}	

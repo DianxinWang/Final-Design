@@ -33,8 +33,8 @@ Motor_InitTypeDef motor_init[4] =
 
 {
 	&htim8,
-	TIM_CHANNEL_1,
 	TIM_CHANNEL_2,
+	TIM_CHANNEL_1,
 	MOTOR_EN_3_GPIO_Port,
 	MOTOR_EN_3_Pin,
 	&htim3,
@@ -44,8 +44,8 @@ Motor_InitTypeDef motor_init[4] =
 
 {
 	&htim8,
-	TIM_CHANNEL_3,
 	TIM_CHANNEL_4,
+	TIM_CHANNEL_3,
 	MOTOR_EN_4_GPIO_Port,
 	MOTOR_EN_4_Pin,
 	&htim4,

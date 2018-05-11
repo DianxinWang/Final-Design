@@ -1,20 +1,29 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
+#include <QQuickStyle>
 #include <QtQml>
-#include "msg.h"
+#include "rhmsg.h"
+#include "dgmsg.h"
+#include "socket.h"
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    qDebug()<<"Main ID"<<QThread::currentThreadId();
-//    qmlRegisterType<Msg>("an.qt.Msg", 1, 0, "Msg");
-    MsgThread msgthread;
+    QQuickStyle::setStyle("Material");
+
+    qDebug()<<"Main ID"<<QThread::currentThreadId();\
+
+    RHMsgThread rhmsgthread;
+    DGMsgThread dgmsgthread(rhmsgthread.m_msg);
     QQmlApplicationEngine engine;
-    engine.rootContext()->setContextProperty("rhMsg", msgthread.m_msg);
-    engine.rootContext()->setContextProperty("rhMsgThread", &msgthread);
+    socket unity;
+    engine.rootContext()->setContextProperty("rhMsg", rhmsgthread.m_msg);
+    engine.rootContext()->setContextProperty("rhMsgThread", &rhmsgthread);
+    engine.rootContext()->setContextProperty("dgMsg", dgmsgthread.m_msg);
+    engine.rootContext()->setContextProperty("dgMsgThread", &dgmsgthread);
+    engine.rootContext()->setContextProperty("unity", &unity);
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
     if (engine.rootObjects().isEmpty())
         return -1;
-
     return app.exec();
 }

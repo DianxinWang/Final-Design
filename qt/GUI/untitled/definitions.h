@@ -13,7 +13,17 @@
 #define PACKET_FOOTER 0x1A
 #define DATA_SIZE_MAX 0x55
 
-#define TESTTIME 1000
+#define UNIX_IP "172.20.10.4"
+#define UNIX_PORT 6777
+
+#define DG_RANGE 1000
+#define RH_RANGE 1000
+#define RH_RESOLUTION 1
+#define DG_RESOLUTION 1
+#define FORCE_THREASHOLD 2000
+#define RH_ENCOUNTER_MAX 65536
+
+#define DG_CALIB_TIMES 1000
 
 typedef unsigned char * packetType;
 typedef unsigned short int uint16_t;
@@ -30,7 +40,7 @@ typedef enum
 {
     CMD				= 0,
 
-    RH_LOG			= 1,
+    RH_Status		= 1,
     MATLAB_LOG  	= 2,
     DG_LOG			= 3,
     UNITY_LOG   	= 4,
@@ -48,6 +58,7 @@ typedef enum
     MotionCTRL		= 2,
     IntervalCTRL	= 3,
     InteLimitCTRL   = 4,
+    RH_StatusRET    = 5,
 } CMDType;
 
 typedef enum

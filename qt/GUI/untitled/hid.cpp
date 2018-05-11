@@ -43,6 +43,7 @@ int Hid::read_wait(unsigned char *data, int milliseconds)
 
 int Hid::write(const unsigned char *data)
 {
+    QMutexLocker locker(&m_lock);
     return hid_write(handle, data, PACKET_SIZE);
 }
 
@@ -53,6 +54,7 @@ int Hid::set_nonblocking(int nonblock)
 void Hid::close()
 {
     hid_close(handle);
+    handle=NULL;
 }
 
 Hid::~Hid()

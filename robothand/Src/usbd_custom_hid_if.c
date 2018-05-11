@@ -69,6 +69,7 @@ static void CMD_PIDParaCTRL(Motor *motor,unsigned char *data);
 static void CMD_MotionCTRL(Motor *motor,unsigned char *data);
 static void CMD_IntervalCTRL(Motor *motor, unsigned char *data);
 static void CMD_InteLimitCTRL(Motor *motor, unsigned char *data);
+static void CMD_RHStatusRET(Motor *motor, unsigned char *data);
 
 RH_CMD_PROCESS_Itf hCMDProcessfunc = 
 {
@@ -77,6 +78,7 @@ RH_CMD_PROCESS_Itf hCMDProcessfunc =
 	CMD_MotionCTRL,
 	CMD_IntervalCTRL,
 	CMD_InteLimitCTRL,
+	CMD_RHStatusRET,
 };
 
 /* USER CODE END PV */
@@ -296,10 +298,8 @@ static void CMD_MotorStatusCTRL(Motor *motor, unsigned char *data)
 
 static void CMD_PIDParaCTRL(Motor *motor, unsigned char *data)
 {
-	for(int i = 0;i < 4; i++)
-	{
-		memcpy(&motor[i].m_pid, &data[1+3*sizeof(float)*i], 3*sizeof(float));
-	}
+	int index = data[1];
+	memcpy(&motor[index].m_pid, &data[2], 3*sizeof(float));
 }
 
 static void CMD_MotionCTRL(Motor *motor, unsigned char *data)
@@ -329,6 +329,13 @@ static void CMD_InteLimitCTRL(Motor *motor, unsigned char *data)
 	{
 		motor[i].setInteLimit(intelimit);
 	}
+}
+
+static void CMD_RHStatusRET(Motor *motor, unsigned char *data)
+{
+	uint8_t msg[64];
+  BuildRH_StatusMsg(motor, msg);
+	USB_Send_64_bytes(msg);
 }
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */

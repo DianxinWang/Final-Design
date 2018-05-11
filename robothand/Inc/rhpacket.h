@@ -31,7 +31,7 @@ typedef enum
 {
 	CMD				= 0,
 	
-	RH_LOG			= 1,
+	RH_Status			= 1,
 	MATLAB_LOG  	= 2,
 	DG_LOG			= 3,
 	UNITY_LOG   	= 4,
@@ -49,6 +49,7 @@ typedef enum
 	MotionCTRL		= 2,
 	IntervalCTRL	= 3,
 	InteLimitCTRL = 4,
+	RH_StatusRET    = 5,
 } CMDType;
 
 typedef enum
@@ -64,6 +65,7 @@ typedef struct
 	void (* motionCTRL)(Motor *,unsigned char *);
 	void (* intervalCTRL)(Motor *,unsigned char *);
 	void (* inteLimitCTRL)(Motor *,unsigned char *);
+	void (* rhstatusRET)(Motor *,unsigned char *);
 } RH_CMD_PROCESS_Itf;
 
 int IsPacketValid(unsigned char *packet);
@@ -85,11 +87,11 @@ void BuildMsg(
 				
 void BuildRH_TraceForceMsg(
 	Motor				*motor,
-	uint16_t			*adc,
+	uint8_t			*adc,
 	unsigned char 		*packet);
-/*void BuildLog(	PacketDestination	dest
-				LogIndex 			index);
-*/
+void BuildRH_StatusMsg(
+	Motor				*motor,
+	unsigned char 		*packet);
 
 #ifdef __cplusplus
 }

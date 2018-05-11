@@ -4,6 +4,8 @@
 #include <QObject>
 #include "hidapi.h"
 #include "definitions.h"
+#include <QMutex>
+
 class Hid : public QObject
 {
     Q_OBJECT
@@ -21,6 +23,7 @@ public:
     int set_nonblocking(int nonblock);
 
     hid_device *handle;
+    QMutex m_lock;
 
 signals:
 

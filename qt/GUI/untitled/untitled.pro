@@ -1,6 +1,9 @@
 QT += quick
+QT += qml
 QT += charts
 QT += concurrent
+QT += network
+QT += quickcontrols2
 CONFIG += c++11
 
 # The following define makes your compiler emit warnings if you use
@@ -17,12 +20,14 @@ DEFINES += QT_DEPRECATED_WARNINGS \
 
 SOURCES += \
         main.cpp \
-    msg.cpp \
-    hid.cpp
+    hid.cpp \
+    socket.cpp \
+    dgmsg.cpp \
+    rhmsg.cpp
 
 
 RESOURCES += qml.qrc
-
+RESOURCES += icons/icons.qrc
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -38,8 +43,10 @@ HEADERS += \
     hid.h \
     hidapi.h \
     definitions.h \
-    msg.h \
-    mathpresso.h
+    mathpresso.h \
+    socket.h \
+    dgmsg.h \
+    rhmsg.h
 
 
 
@@ -47,7 +54,6 @@ win32: LIBS += -L$$PWD/./ -lmathpresso
 
 INCLUDEPATH += $$PWD/.
 DEPENDPATH += $$PWD/.
-
 
 win32: LIBS += -L$$PWD/./ -lhidapi
 

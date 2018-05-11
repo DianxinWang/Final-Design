@@ -77,7 +77,7 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+void dataFilter(uint8_t *oriData, uint8_t *filtereddData);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -124,9 +124,10 @@ int main(void)
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
 
-	static uint16_t force[4] = {0};
+  static uint8_t force[20] = {0};
 	static unsigned char msg[64] = {0};
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&force,16);
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)force, 20);
+	static uint8_t filteredForce[5] = {0};
 	for(int i = 0; i < 4; i++)
 	{
 		motor[i].disable();
@@ -152,7 +153,8 @@ int main(void)
 				
 				
 			//sending report to PC
-			BuildRH_TraceForceMsg(motor, force, msg);
+			dataFilter(force, filteredForce);
+			BuildRH_TraceForceMsg(motor, filteredForce, msg);
 			USB_Send_64_bytes(msg);
 		}			
   }
@@ -221,6 +223,42 @@ void SystemClock_Config(void)
 void HAL_SYSTICK_Callback(void)
 {
 	CtrlInterv--;
+}
+
+void dataFilter(uint8_t *oriData, uint8_t *filtereddData)
+{
+  int sum = 0;
+	uint8_t size = 4;
+	uint8_t temp = 0;
+	uint8_t data[20];
+	uint8_t tempdata[20];
+	memset(tempdata, 0, 20);
+	memset(data, 0, 20);
+	memcpy(tempdata, oriData, 20);
+	for(int i = 0; i < 20; i++)
+	{
+		data[i] = tempdata[i%4*5+i/4];
+	}
+  uint8_t *dataptr = data; 
+	for(int k = 0; k < 5; k++)
+	{
+		for(int j = 0; j < size-1; j++)
+		{
+			for (int i = 0; i < size-j; i++)
+			{
+        if ( dataptr[i] > dataptr[i+1] )
+        {
+           temp = dataptr[i];
+           dataptr[i] = dataptr[i+1];
+           dataptr[i+1] = temp;
+        }
+			}
+		}
+		for(int count=1; count < size-1; count++)
+		sum += data[count];
+		filtereddData[k] = (uint8_t)(sum/(size-2));
+		dataptr = &data[4*k];
+	}
 }
 /* USER CODE END 4 */
 
