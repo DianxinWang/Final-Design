@@ -133,7 +133,7 @@ extern int16_t dr;
   */
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-int8_t USB_Send_64_bytes(void *report, uint16_t len);
+int8_t USB_Send_64_bytes(void *report);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**

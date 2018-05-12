@@ -59,6 +59,7 @@
 #include "usbd_custom_hid_if.h"
 #include "motor.h"
 #include "usr_init.h"
+#include "rhpacket.h"
 #include <cstring>
 /* USER CODE END Includes */
 
@@ -66,8 +67,9 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
-bool PIDflag = true;
+Motor motor[4] = {Motor(motor_init[0]),Motor(motor_init[1]),Motor(motor_init[2]),Motor(motor_init[3])};
+uint16_t Motor::m_interval = 10;
+static int16_t CtrlInterv = 10;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,7 +77,7 @@ void SystemClock_Config(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+void dataFilter(uint8_t *oriData, uint8_t *filtereddData);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -121,54 +123,40 @@ int main(void)
   MX_TIM8_Init();
   MX_USB_DEVICE_Init();
   /* USER CODE BEGIN 2 */
- Motor motor[4] = {Motor(motor_init[0]),Motor(motor_init[1]),Motor(motor_init[2]),Motor(motor_init[3])};
-	motor[0].enable();
-	motor[0].setDutyratio(40);
-	motor[0].start();
-	/*
-	Motor motor3(motor_3_init);
-	motor3.enable();
-	motor3.setDutyratio(40);
-	motor3.start();
-	
-	Motor motor2(motor_2_init);
-	motor2.enable();
-	motor2.setDutyratio(100);
-	motor2.start();
-	
-	Motor motor1(motor_1_init);
-	motor1.enable();
-	motor1.setDutyratio(40);
-	motor1.start();*/
-	
-	
-	uint16_t temp[16] = {0};
-	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)&temp,16);
+
+  static uint8_t force[20] = {0};
+	static unsigned char msg[64] = {0};
+	HAL_ADC_Start_DMA(&hadc1,(uint32_t *)force, 20);
+	static uint8_t filteredForce[5] = {0};
+	for(int i = 0; i < 4; i++)
+	{
+		motor[i].disable();
+	}
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
   /* USER CODE END WHILE */
 
-  /* USER CODE BEGIN 3 */
-	while (PIDflag)
-		{
-			PIDflag = false;
-			dr = dr ;
-			motor[2].pid_process();
-			motor[2].start();
-			/*temp[i] = motor2.getEncoderValue();
-			i++;
-			if(i > 31) 
+	/* USER CODE BEGIN 3 */
+		if(CtrlInterv <= 0)
+		{	
+			CtrlInterv = Motor::m_interval;
+			//start motor functions
+			for(int i = 0; i <4; i++)
 			{
-				i = 0;
-				USB_Send_64_bytes(temp,64);
-				HAL_Delay(1000);
-			}*/
-		}	
+				motor[i].pid_process();
+				motor[i].start();
+			}
+				
+				
+			//sending report to PC
+			dataFilter(force, filteredForce);
+			BuildRH_TraceForceMsg(motor, filteredForce, msg);
+			USB_Send_64_bytes(msg);
+		}			
   }
   /* USER CODE END 3 */
 
@@ -234,7 +222,43 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_SYSTICK_Callback(void)
 {
-	PIDflag = true;
+	CtrlInterv--;
+}
+
+void dataFilter(uint8_t *oriData, uint8_t *filtereddData)
+{
+  int sum = 0;
+	uint8_t size = 4;
+	uint8_t temp = 0;
+	uint8_t data[20];
+	uint8_t tempdata[20];
+	memset(tempdata, 0, 20);
+	memset(data, 0, 20);
+	memcpy(tempdata, oriData, 20);
+	for(int i = 0; i < 20; i++)
+	{
+		data[i] = tempdata[i%4*5+i/4];
+	}
+  uint8_t *dataptr = data; 
+	for(int k = 0; k < 5; k++)
+	{
+		for(int j = 0; j < size-1; j++)
+		{
+			for (int i = 0; i < size-j; i++)
+			{
+        if ( dataptr[i] > dataptr[i+1] )
+        {
+           temp = dataptr[i];
+           dataptr[i] = dataptr[i+1];
+           dataptr[i+1] = temp;
+        }
+			}
+		}
+		for(int count=1; count < size-1; count++)
+		sum += data[count];
+		filtereddData[k] = (uint8_t)(sum/(size-2));
+		dataptr = &data[4*k];
+	}
 }
 /* USER CODE END 4 */
 
