@@ -258,6 +258,7 @@ void dataFilter(uint8_t *oriData, uint8_t *filtereddData)
 		sum += data[count];
 		filtereddData[k] = (uint8_t)(sum/(size-2));
 		dataptr = &data[4*k];
+		sum = 0;
 	}
 }
 /* USER CODE END 4 */

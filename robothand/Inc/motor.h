@@ -19,7 +19,7 @@ typedef struct Motor_Init
 	TIM_HandleTypeDef *Ehtim; 
 	GPIO_TypeDef 			*EGPIOx; //Todo delete
 	uint16_t 				EGPIO_Pin;
-	
+	bool						Rotate_Direction;
 }Motor_InitTypeDef;
 
 
@@ -56,6 +56,7 @@ private:
 	GPIO_TypeDef 			*m_EGPIOx; 
 	uint16_t 				m_EGPIO_Pin;
 	int8_t  				m_dutyratio;
+  bool 						m_Rotate_Direction;
 /*
  * These varialbes are intended for PID motion control
  */

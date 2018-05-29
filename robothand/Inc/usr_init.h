@@ -11,13 +11,39 @@ Motor_InitTypeDef motor_init[4] =
 {
 {
 	&htim5,
-	TIM_CHANNEL_1,
 	TIM_CHANNEL_2,
+	TIM_CHANNEL_1,
 	MOTOR_EN_1_GPIO_Port,
 	MOTOR_EN_1_Pin,
 	&htim1,
 	ENCODER_EN_1_GPIO_Port,
 	ENCODER_EN_1_Pin,
+	false
+},
+
+{
+	&htim8,
+	TIM_CHANNEL_3,
+	TIM_CHANNEL_4,
+	MOTOR_EN_4_GPIO_Port,
+	MOTOR_EN_4_Pin,
+	&htim4,
+	ENCODER_EN_3_GPIO_Port,
+	ENCODER_EN_3_Pin,
+	false
+}
+,
+
+{
+	&htim8,
+	TIM_CHANNEL_2,
+	TIM_CHANNEL_1,
+	MOTOR_EN_3_GPIO_Port,
+	MOTOR_EN_3_Pin,
+	&htim3,
+	ENCODER_EN_3_GPIO_Port,
+	ENCODER_EN_3_Pin,
+	true
 },
 
 {
@@ -28,29 +54,8 @@ Motor_InitTypeDef motor_init[4] =
 	MOTOR_EN_2_Pin,
 	&htim2,
 	ENCODER_EN_2_GPIO_Port,
-	ENCODER_EN_2_Pin
-},
-
-{
-	&htim8,
-	TIM_CHANNEL_2,
-	TIM_CHANNEL_1,
-	MOTOR_EN_3_GPIO_Port,
-	MOTOR_EN_3_Pin,
-	&htim3,
-	ENCODER_EN_3_GPIO_Port,
-	ENCODER_EN_3_Pin
-},
-
-{
-	&htim8,
-	TIM_CHANNEL_4,
-	TIM_CHANNEL_3,
-	MOTOR_EN_4_GPIO_Port,
-	MOTOR_EN_4_Pin,
-	&htim4,
-	ENCODER_EN_3_GPIO_Port,
-	ENCODER_EN_3_Pin
+	ENCODER_EN_2_Pin,
+	true
 }
 };
 

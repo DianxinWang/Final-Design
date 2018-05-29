@@ -5,7 +5,7 @@
 
 void pid_init(pid_ctrl_t *pid)
 {
-    pid_set_gains(pid, 0.01, 0.02, 0.);
+    pid_set_gains(pid, 0.022, 0.07, 0.002);
     pid->integrator = 0.;
     pid->previous_error = 0.;
     pid->integrator_limit = INFINITY;
@@ -52,6 +52,14 @@ float pid_process(pid_ctrl_t *pid, float error)
     output += - pid->kd * (error - pid->previous_error) * pid->frequency;
 
     pid->previous_error = error;
+		if(error > 700){
+			output = -100;
+			pid->integrator=0;
+		}
+		else if(error < -700){
+			output = 100;
+			pid->integrator=0;
+		}
     return output;
 }
 

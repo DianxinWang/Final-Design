@@ -15,8 +15,9 @@ Motor::Motor(Motor_InitTypeDef MotEnc)
 	m_Ehtim = MotEnc.Ehtim;
 	m_EGPIOx = MotEnc.EGPIOx;  			//Todo delte
 	m_EGPIO_Pin = MotEnc.EGPIO_Pin;
+	m_Rotate_Direction = MotEnc.Rotate_Direction;
 	pid_init(&m_pid);
-	pid_set_gains(&m_pid, 0.01, 0.002, 0);
+	pid_set_gains(&m_pid, 0.022, 0.07, 0.002);
 };
 
 Motor::~Motor()
@@ -36,7 +37,6 @@ void Motor::disable()
 	HAL_GPIO_WritePin(m_EGPIOx, m_EGPIO_Pin, GPIO_PIN_RESET);
 	HAL_TIM_Encoder_Stop(m_Ehtim, TIM_CHANNEL_ALL);
 	pid_init(&m_pid);
-	
 }
 
 void Motor::start()
@@ -82,7 +82,10 @@ int8_t Motor::getDutyRatio()
 
 void Motor::getEncoderValue()
 {
-	m_EncValue = (int16_t)(__HAL_TIM_GET_COUNTER(m_Ehtim));
+	if(m_Rotate_Direction)
+		m_EncValue = (int16_t)(__HAL_TIM_GET_COUNTER(m_Ehtim));
+	else
+		m_EncValue = -(int16_t)(__HAL_TIM_GET_COUNTER(m_Ehtim));
 }
 
 void Motor::setDutyratio(int8_t dutyratio)
