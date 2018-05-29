@@ -21,6 +21,7 @@
         <file>icons/social_share.svg</file>
         <file>pidtesttab.qml</file>
         <file>dataglovetest.qml</file>
-        <file>dgchart.qml</file>
+        <file>dgchart_1.qml</file>
+        <file>dgchart_2.qml</file>
     </qresource>
 </RCC>

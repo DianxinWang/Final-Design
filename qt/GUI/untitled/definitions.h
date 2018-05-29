@@ -14,15 +14,22 @@
 #define DATA_SIZE_MAX 0x55
 
 #define UNIX_IP "172.20.10.4"
+//#define UNIX_IP "127.0.0.1"
 #define UNIX_PORT 6777
 
-#define DG_RANGE 1000
+//For chartview
+#define DG_RANGE 500
 #define RH_RANGE 1000
-#define RH_RESOLUTION 1
-#define DG_RESOLUTION 1
-#define FORCE_THREASHOLD 2000
-#define RH_ENCOUNTER_MAX 65536
+#define RH_RESOLUTION 4
+#define DG_RESOLUTION 4
+#define DG_POINTS_NUM 22
+#define DG_UPPER_FORCE 10000
 
+//For control
+#define FORCE_THREASHOLD 2000
+#define RH_ENCOUNTER_MAX 32000
+
+//For calibration
 #define DG_CALIB_TIMES 1000
 
 typedef unsigned char * packetType;
