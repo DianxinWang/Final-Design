@@ -12,7 +12,7 @@ Item {
     property alias dialgtext: emergentStop.text
     property alias real_trace: real_trace
     property alias ideal_trace: ideal_trace
-    property int index
+    property var index
 
     ChartView {
         id: rh_view

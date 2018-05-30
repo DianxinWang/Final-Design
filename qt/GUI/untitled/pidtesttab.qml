@@ -57,7 +57,7 @@ Item {
                             }
                         } else {
                             rhMsg.stopTest()
-                            dgMsg.stopExport()
+                            dgMsg.stopRH()
                             rhMsg.stophid()
                         }
                     }
@@ -99,7 +99,7 @@ Item {
                 text: " Choose Finger"
                 model: [" Thumb", " Forefinger", " Middle Finger", " Ring Finger & Little Finger"]
                 onSelectedIndexChanged: {
-                    example.item.index = selectedIndex
+                    example.index = selectedIndex
                     resetpid()
                 }
             }
@@ -196,6 +196,16 @@ Item {
             }
         }
     }
+    Rhchart {
+        id:example
+        visible: true
+        anchors {
+            left: sidebar.right
+            right: parent.right
+            top: parent.top
+            bottom: parent.bottom
+    }
+        /*
     Flickable {
         anchors {
             left: sidebar.right
@@ -204,23 +214,27 @@ Item {
             bottom: parent.bottom
         }
         clip: true
-        contentHeight: Math.max(example.implicitHeight + 40, height)
+        contentHeight: Math.max(example.height + 40, height)
+
         Loader {
             id: example
             anchors.fill: parent
             asynchronous: true
             visible: status == Loader.Ready
             //property int index: fingerselect.selectedIndex
-            source: "rhchart.qml"
+            source: "Rhchart.qml"
             onLoaded: {
                 item.resetpidsignal.connect(resetpid)
             }
-        }
+        }*/
 
+
+/*
         ProgressCircle {
             anchors.centerIn: parent
             visible: example.status == Loader.Loading
-        }
+        }*/
+
     }
 
     Dialog {
