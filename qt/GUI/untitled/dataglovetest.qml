@@ -61,14 +61,14 @@ Item {
                                 rhMsg.stopTest()
                                 rhMsg.sendEnable(1,1,1,1)
                                 dgMsg.startRH()
-                                dgchartloader0.item.istracked = true
-                                dgchartloader1.item.istracked = true
+                                dgchartloader0.istracked = true
+                                dgchartloader1.istracked = true
                             } else {
                                 checked = false
                             }
                         } else {
-                            dgchartloader0.item.istracked = false
-                            dgchartloader1.item.istracked = false
+                            dgchartloader0.istracked = false
+                            dgchartloader1.istracked = false
                             if(rhMsg.isConnected())
                             {
                                 rhMsg.stopTest()
@@ -126,6 +126,7 @@ Item {
         }
         clip: true
         contentHeight: Math.max(dgchartloader0.implicitHeight + 40, height)
+ /*
         Loader {
             id: dgchartloader0
             anchors.top: parent.top
@@ -134,7 +135,7 @@ Item {
             width: parent.width/2
             asynchronous: true
             visible: status == Loader.Ready
-            source: "dgchart_1.qml"
+            source: "Dgchart_1.qml"
             onLoaded: {
             }
         }
@@ -146,7 +147,7 @@ Item {
             width: parent.width/2
             asynchronous: true
             visible: status == Loader.Ready
-            source: "dgchart_2.qml"
+            source: "Dgchart_2.qml"
             onLoaded: {
             }
         }
@@ -154,6 +155,22 @@ Item {
         ProgressCircle {
             anchors.centerIn: parent
             visible: dgchartloader0.status == Loader.Loading
+        }
+        */
+        Dgchart_1 {
+            id: dgchartloader0
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            width: parent.width/2
+        }
+
+        Dgchart_2 {
+            id: dgchartloader1
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            width: parent.width/2
         }
 
         Ink {

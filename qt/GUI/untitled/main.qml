@@ -6,7 +6,7 @@ import Material.ListItems 0.1 as ListItem
 ApplicationWindow {
     id: demo
 
-    title: "Material for QtQuick Demo"
+    title: "Software Test Platform"
 
     // Necessary when loading the window from C++
     visible: true
