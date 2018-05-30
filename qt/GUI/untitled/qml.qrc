@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>rhchart.qml</file>
+        <file>Rhchart.qml</file>
         <file>main.qml</file>
         <file>icons/action_account_circle.svg</file>
         <file>icons/action_autorenew.svg</file>
@@ -21,7 +21,7 @@
         <file>icons/social_share.svg</file>
         <file>pidtesttab.qml</file>
         <file>dataglovetest.qml</file>
-        <file>dgchart_1.qml</file>
-        <file>dgchart_2.qml</file>
+        <file>Dgchart_1.qml</file>
+        <file>Dgchart_2.qml</file>
     </qresource>
 </RCC>
