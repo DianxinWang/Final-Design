@@ -196,6 +196,7 @@ Item {
             }
         }
     }
+
     Rhchart {
         id:example
         visible: true
@@ -205,7 +206,7 @@ Item {
             top: parent.top
             bottom: parent.bottom
     }
-        /*
+/*
     Flickable {
         anchors {
             left: sidebar.right
