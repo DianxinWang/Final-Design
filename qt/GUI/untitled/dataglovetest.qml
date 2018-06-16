@@ -155,8 +155,8 @@ Item {
         ProgressCircle {
             anchors.centerIn: parent
             visible: dgchartloader0.status == Loader.Loading
-        }
-        */
+        }*/
+
         Dgchart_1 {
             id: dgchartloader0
             anchors.top: parent.top

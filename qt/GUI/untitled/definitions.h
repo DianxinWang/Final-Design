@@ -13,8 +13,8 @@
 #define PACKET_FOOTER 0x1A
 #define DATA_SIZE_MAX 0x55
 
-#define UNIX_IP "172.20.10.4"
-//#define UNIX_IP "127.0.0.1"
+//#define UNIX_IP "172.20.10.4"
+#define UNIX_IP "127.0.0.1"
 #define UNIX_PORT 6777
 
 //For chartview
